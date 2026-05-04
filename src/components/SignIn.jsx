@@ -21,7 +21,7 @@ export default function SignIn() {
             queryn
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-            AI-powered WGU CS study tool
+            AI-powered CS study tool
           </Typography>
           <Button
             variant="contained"
