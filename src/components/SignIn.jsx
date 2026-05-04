@@ -1,8 +1,10 @@
-import { Box, Button, Card, CardContent, Typography } from '@mui/material'
+import { Box, Button, Card, CardContent, Typography, IconButton, Tooltip } from '@mui/material'
 import GoogleIcon from '@mui/icons-material/Google'
+import DarkModeIcon from '@mui/icons-material/DarkMode'
+import LightModeIcon from '@mui/icons-material/LightMode'
 import { useAuth } from '../context/AuthContext'
 
-export default function SignIn() {
+export default function SignIn({ onToggleMode, mode }) {
   const { signInWithGoogle } = useAuth()
 
   return (
@@ -15,7 +17,14 @@ export default function SignIn() {
         bgcolor: 'background.default',
       }}
     >
-      <Card sx={{ maxWidth: 400, width: '100%', mx: 2, p: 2 }} elevation={3}>
+      <Box sx={{ position: 'fixed', top: 16, right: 16 }}>
+        <Tooltip title={mode === 'light' ? 'Dark mode' : 'Light mode'}>
+          <IconButton onClick={onToggleMode} color="primary">
+            {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
+          </IconButton>
+        </Tooltip>
+      </Box>
+      <Card sx={{ maxWidth: 400, width: '100%', mx: 2, p: 2 }}>
         <CardContent sx={{ textAlign: 'center' }}>
           <Typography variant="h4" color="primary" gutterBottom>
             queryn

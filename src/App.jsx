@@ -1,9 +1,12 @@
-import { ThemeProvider, CssBaseline, Box, CircularProgress, Typography, Button } from '@mui/material'
-import theme from './theme'
+import { useState, useMemo } from 'react'
+import { ThemeProvider, CssBaseline, Box, CircularProgress, Typography, Button, IconButton, Tooltip } from '@mui/material'
+import DarkModeIcon from '@mui/icons-material/DarkMode'
+import LightModeIcon from '@mui/icons-material/LightMode'
+import { createAppTheme } from './theme'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import SignIn from './components/SignIn'
 
-function AppContent() {
+function AppContent({ onToggleMode, mode }) {
   const { user, loading, signOut } = useAuth()
 
   if (loading) {
@@ -15,7 +18,7 @@ function AppContent() {
   }
 
   if (!user) {
-    return <SignIn />
+    return <SignIn onToggleMode={onToggleMode} mode={mode} />
   }
 
   return (
@@ -26,19 +29,30 @@ function AppContent() {
       <Typography variant="body1" color="text.secondary" gutterBottom>
         Welcome, {user.displayName}
       </Typography>
-      <Button variant="outlined" onClick={signOut} sx={{ mt: 2 }}>
-        Sign out
-      </Button>
+      <Box sx={{ mt: 2, display: 'flex', gap: 2, justifyContent: 'center', alignItems: 'center' }}>
+        <Button variant="outlined" onClick={signOut}>
+          Sign out
+        </Button>
+        <Tooltip title={mode === 'light' ? 'Dark mode' : 'Light mode'}>
+          <IconButton onClick={onToggleMode} color="primary">
+            {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
+          </IconButton>
+        </Tooltip>
+      </Box>
     </Box>
   )
 }
 
 export default function App() {
+  const [mode, setMode] = useState('light')
+  const theme = useMemo(() => createAppTheme(mode), [mode])
+  const toggleMode = () => setMode(m => m === 'light' ? 'dark' : 'light')
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
-        <AppContent />
+        <AppContent onToggleMode={toggleMode} mode={mode} />
       </AuthProvider>
     </ThemeProvider>
   )
