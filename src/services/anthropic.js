@@ -31,3 +31,21 @@ Example format:
 
   return parsed
 }
+
+export async function generateSessionSummary(topic, results) {
+  const client = new Anthropic({ apiKey: import.meta.env.VITE_ANTHROPIC_API_KEY, dangerouslyAllowBrowser: true })
+  const resultLines = results
+    .map(r => `Q: ${r.question} | Correct: ${r.correctIndex} | Selected: ${r.selectedIndex}`)
+    .join('\n')
+  const response = await client.messages.create({
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 256,
+    messages: [
+      {
+        role: 'user',
+        content: `A CS student just completed a quiz on "${topic}". Here are their results:\n\n${resultLines}\n\nWrite a 2-3 sentence personalized summary of their performance. Note what they did well and what to review. Return plain text only, no JSON.`,
+      },
+    ],
+  })
+  return response.content[0].text.trim()
+}

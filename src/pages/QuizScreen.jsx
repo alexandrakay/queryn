@@ -19,6 +19,7 @@ export default function QuizScreen() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedIndex, setSelectedIndex] = useState(null)
   const [score, setScore] = useState(0)
+  const [results, setResults] = useState([])
 
   useEffect(() => {
     generateQuestions(topic)
@@ -54,11 +55,12 @@ export default function QuizScreen() {
     if (answered) return
     setSelectedIndex(i)
     if (i === question.correctIndex) setScore(s => s + 1)
+    setResults(prev => [...prev, { question: question.question, correctIndex: question.correctIndex, selectedIndex: i }])
   }
 
   function handleNext() {
     if (isLast) {
-      navigate('/score', { state: { score, total: questions.length, topic } })
+      navigate('/score', { state: { score, total: questions.length, topic, results } })
     } else {
       setCurrentIndex(i => i + 1)
       setSelectedIndex(null)
