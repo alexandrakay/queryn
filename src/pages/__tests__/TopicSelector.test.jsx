@@ -15,7 +15,10 @@ const TOPICS = [
   'Databases',
   'Networks',
   'Software Design',
-  'Calculus',
+  'Limits',
+  'Derivatives',
+  'Integrals',
+  'Differential Equations',
 ]
 
 function renderWithRouter() {
@@ -32,17 +35,22 @@ function renderWithRouter() {
 }
 
 describe('TopicSelector', () => {
-  it('renders all 7 topic cards', () => {
+  it('renders all 10 topic cards', () => {
     renderWithRouter()
     TOPICS.forEach(topic => {
       expect(screen.getByText(topic)).toBeInTheDocument()
     })
   })
 
+  it('does not render the old Calculus card', () => {
+    renderWithRouter()
+    expect(screen.queryByText('Calculus')).not.toBeInTheDocument()
+  })
+
   it('navigates to /quiz/:topic when a card is clicked', async () => {
     const user = userEvent.setup()
     renderWithRouter()
-    await user.click(screen.getByText('Algorithms'))
+    await user.click(screen.getByText('Derivatives'))
     expect(screen.getByTestId('quiz-screen')).toBeInTheDocument()
   })
 })

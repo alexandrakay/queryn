@@ -6,6 +6,9 @@ import StorageIcon from '@mui/icons-material/Storage'
 import LanIcon from '@mui/icons-material/Lan'
 import ArchitectureIcon from '@mui/icons-material/Architecture'
 import FunctionsIcon from '@mui/icons-material/Functions'
+import ShowChartIcon from '@mui/icons-material/ShowChart'
+import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions'
+import CalculateIcon from '@mui/icons-material/Calculate'
 import { useNavigate } from 'react-router-dom'
 
 const TOPICS = [
@@ -15,7 +18,10 @@ const TOPICS = [
   { label: 'Databases', icon: StorageIcon },
   { label: 'Networks', icon: LanIcon },
   { label: 'Software Design', icon: ArchitectureIcon },
-  { label: 'Calculus', icon: FunctionsIcon },
+  { label: 'Limits', icon: ShowChartIcon },
+  { label: 'Derivatives', icon: FunctionsIcon },
+  { label: 'Integrals', icon: IntegrationInstructionsIcon },
+  { label: 'Differential Equations', icon: CalculateIcon },
 ]
 
 export default function TopicSelector() {
