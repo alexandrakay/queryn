@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from '@mui/material'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
@@ -23,6 +24,7 @@ const MOCK_SESSIONS = [
     topic: 'Algorithms',
     score: 4,
     totalQuestions: 5,
+    aiFeedback: 'Strong on sorting. Review graph traversal.',
     createdAt: { toDate: () => new Date('2026-05-01T10:00:00Z') },
   },
   {
@@ -30,6 +32,7 @@ const MOCK_SESSIONS = [
     topic: 'Databases',
     score: 2,
     totalQuestions: 5,
+    aiFeedback: 'Good on normalization. Practice query optimization.',
     createdAt: { toDate: () => new Date('2026-04-30T10:00:00Z') },
   },
 ]
@@ -72,5 +75,28 @@ describe('HistoryScreen', () => {
     getSessions.mockResolvedValue([])
     renderHistory()
     await waitFor(() => expect(screen.getByTestId('empty-history')).toBeInTheDocument())
+  })
+
+  it('AI summary is not visible before expanding', async () => {
+    renderHistory()
+    await waitFor(() => screen.getByText('Algorithms'))
+    expect(screen.queryByText('Strong on sorting. Review graph traversal.')).not.toBeInTheDocument()
+  })
+
+  it('shows AI summary after clicking a session', async () => {
+    const user = userEvent.setup()
+    renderHistory()
+    await waitFor(() => screen.getByText('Algorithms'))
+    await user.click(screen.getByText('Algorithms'))
+    expect(screen.getByText('Strong on sorting. Review graph traversal.')).toBeInTheDocument()
+  })
+
+  it('collapses the summary when clicked again', async () => {
+    const user = userEvent.setup()
+    renderHistory()
+    await waitFor(() => screen.getByText('Algorithms'))
+    await user.click(screen.getByText('Algorithms'))
+    await user.click(screen.getByText('Algorithms'))
+    expect(screen.queryByText('Strong on sorting. Review graph traversal.')).not.toBeInTheDocument()
   })
 })
