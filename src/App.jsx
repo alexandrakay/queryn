@@ -7,6 +7,7 @@ import { createAppTheme } from './theme'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import SignIn from './components/SignIn'
 import TopicSelector from './pages/TopicSelector'
+import QuizScreen from './pages/QuizScreen'
 
 function ModeToggle({ mode, onToggle }) {
   return (
@@ -42,7 +43,7 @@ function AppRoutes({ mode, onToggleMode }) {
       <ModeToggle mode={mode} onToggle={onToggleMode} />
       <Routes>
         <Route path="/" element={<TopicSelector />} />
-        <Route path="/quiz/:topic" element={<div>Quiz screen coming soon</div>} />
+        <Route path="/quiz/:topic" element={<QuizScreen />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
