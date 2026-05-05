@@ -2,16 +2,28 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from '@mui/material'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createAppTheme } from '../../theme'
 import ScoreScreen from '../ScoreScreen'
 
+vi.mock('../../context/AuthContext', () => ({
+  useAuth: () => ({ user: { uid: 'test-uid' } }),
+}))
+
+vi.mock('../../services/anthropic', () => ({
+  generateSessionSummary: vi.fn().mockResolvedValue('Great job overall!'),
+}))
+
+vi.mock('../../services/firestore', () => ({
+  saveSession: vi.fn().mockResolvedValue('session-123'),
+}))
+
 const theme = createAppTheme('light')
 
-function renderAtRoute({ score = 3, total = 5, topic = 'Algorithms' } = {}) {
+function renderAtRoute({ score = 3, total = 5, topic = 'Algorithms', results = [] } = {}) {
   return render(
     <ThemeProvider theme={theme}>
-      <MemoryRouter initialEntries={[{ pathname: '/score', state: { score, total, topic } }]}>
+      <MemoryRouter initialEntries={[{ pathname: '/score', state: { score, total, topic, results } }]}>
         <Routes>
           <Route path="/score" element={<ScoreScreen />} />
           <Route path="/" element={<div data-testid="topic-selector" />} />
@@ -32,9 +44,9 @@ describe('ScoreScreen', () => {
     expect(screen.getByText(/Algorithms/i)).toBeInTheDocument()
   })
 
-  it('shows a placeholder AI summary', () => {
+  it('shows an AI summary card', () => {
     renderAtRoute()
-    expect(screen.getByTestId('ai-feedback')).toBeInTheDocument()
+    expect(screen.getByText(/AI Summary/i)).toBeInTheDocument()
   })
 
   it('returns to topic selector on button click', async () => {

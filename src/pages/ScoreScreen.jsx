@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
 import { Box, Card, CardContent, Typography, Button, Divider, CircularProgress } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { generateSessionSummary } from '../services/anthropic'
+import { saveSession } from '../services/firestore'
 
 export default function ScoreScreen() {
   const { state } = useLocation()
   const navigate = useNavigate()
+  const { user } = useAuth()
   const { score = 0, total = 5, topic = '', results = [] } = state ?? {}
   const [aiFeedback, setAiFeedback] = useState(null)
   const [summaryLoading, setSummaryLoading] = useState(true)
@@ -16,7 +19,18 @@ export default function ScoreScreen() {
       return
     }
     generateSessionSummary(topic, results)
-      .then(setAiFeedback)
+      .then(summary => {
+        setAiFeedback(summary)
+        if (user) {
+          saveSession(user.uid, {
+            topic,
+            score,
+            totalQuestions: total,
+            aiFeedback: summary,
+            questions: results,
+          }).catch(() => {})
+        }
+      })
       .catch(() => setAiFeedback('Unable to generate summary. Please try again.'))
       .finally(() => setSummaryLoading(false))
   }, [])
