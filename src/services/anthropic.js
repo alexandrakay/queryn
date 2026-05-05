@@ -22,7 +22,8 @@ Example format:
     ],
   })
 
-  const text = response.content[0].text.trim()
+  const raw = response.content[0].text.trim()
+  const text = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '')
   const parsed = JSON.parse(text)
 
   if (!Array.isArray(parsed) || parsed.length !== 5) {
