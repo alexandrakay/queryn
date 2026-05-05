@@ -40,29 +40,54 @@ const MOCK_QUESTIONS = [
   },
 ]
 
+function optionSx(i, selectedIndex, correctIndex) {
+  if (selectedIndex === null) return {}
+  if (i === correctIndex) return { borderColor: '#4A7C59', color: '#4A7C59', bgcolor: '#4A7C5912' }
+  if (i === selectedIndex) return { borderColor: '#9B3A3A', color: '#9B3A3A', bgcolor: '#9B3A3A12' }
+  return {}
+}
+
 export default function QuizScreen() {
   const { topic } = useParams()
   const navigate = useNavigate()
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [selectedIndex, setSelectedIndex] = useState(null)
+  const [score, setScore] = useState(0)
 
   const question = MOCK_QUESTIONS[currentIndex]
-  const progress = ((currentIndex) / MOCK_QUESTIONS.length) * 100
+  const answered = selectedIndex !== null
+  const progress = (currentIndex / MOCK_QUESTIONS.length) * 100
+  const isLast = currentIndex === MOCK_QUESTIONS.length - 1
+
+  function handleSelect(i) {
+    if (answered) return
+    setSelectedIndex(i)
+    if (i === question.correctIndex) setScore(s => s + 1)
+  }
+
+  function handleNext() {
+    if (isLast) {
+      navigate('/')
+    } else {
+      setCurrentIndex(i => i + 1)
+      setSelectedIndex(null)
+    }
+  }
 
   return (
     <Box sx={{ p: 4, maxWidth: 720, mx: 'auto' }}>
-      <Typography variant="body2" color="text.secondary" gutterBottom>
-        {topic}
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+        <Typography variant="body2" color="text.secondary">{topic}</Typography>
+        <Typography variant="body2" color="text.secondary" data-testid="score">
+          {score}
+        </Typography>
+      </Box>
 
       <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
         Question {currentIndex + 1} of {MOCK_QUESTIONS.length}
       </Typography>
 
-      <LinearProgress
-        variant="determinate"
-        value={progress}
-        sx={{ mb: 4, height: 4 }}
-      />
+      <LinearProgress variant="determinate" value={progress} sx={{ mb: 4, height: 4 }} />
 
       <Card sx={{ mb: 3 }}>
         <CardContent sx={{ p: 3 }}>
@@ -77,21 +102,36 @@ export default function QuizScreen() {
           <Button
             key={i}
             variant="outlined"
+            disabled={answered}
+            sx={{ justifyContent: 'flex-start', py: 1.5, px: 2, textTransform: 'none', ...optionSx(i, selectedIndex, question.correctIndex) }}
             fullWidth
             aria-label={`option ${i + 1}`}
-            sx={{ justifyContent: 'flex-start', py: 1.5, px: 2, textTransform: 'none' }}
-            onClick={() => {
-              if (currentIndex < MOCK_QUESTIONS.length - 1) {
-                setCurrentIndex(i => i + 1)
-              } else {
-                navigate('/')
-              }
-            }}
+            onClick={() => handleSelect(i)}
           >
             <Typography variant="body1">{option}</Typography>
           </Button>
         ))}
       </Stack>
+
+      {answered && (
+        <Box sx={{ mt: 3 }}>
+          <Card variant="outlined" sx={{ bgcolor: 'background.paper', mb: 2 }}>
+            <CardContent>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                fontStyle="italic"
+                data-testid="explanation"
+              >
+                {question.explanation}
+              </Typography>
+            </CardContent>
+          </Card>
+          <Button variant="contained" fullWidth onClick={handleNext}>
+            {isLast ? 'See Results' : 'Next'}
+          </Button>
+        </Box>
+      )}
     </Box>
   )
 }

@@ -1,8 +1,12 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
-import { describe, it, expect, vi } from 'vitest'
+import { ThemeProvider } from '@mui/material'
+import { describe, it, expect } from 'vitest'
+import { createAppTheme } from '../../theme'
 import TopicSelector from '../TopicSelector'
+
+const theme = createAppTheme('light')
 
 const TOPICS = [
   'Data Structures',
@@ -16,12 +20,14 @@ const TOPICS = [
 
 function renderWithRouter() {
   return render(
-    <MemoryRouter initialEntries={['/']}>
-      <Routes>
-        <Route path="/" element={<TopicSelector />} />
-        <Route path="/quiz/:topic" element={<div data-testid="quiz-screen" />} />
-      </Routes>
-    </MemoryRouter>
+    <ThemeProvider theme={theme}>
+      <MemoryRouter initialEntries={['/']}>
+        <Routes>
+          <Route path="/" element={<TopicSelector />} />
+          <Route path="/quiz/:topic" element={<div data-testid="quiz-screen" />} />
+        </Routes>
+      </MemoryRouter>
+    </ThemeProvider>
   )
 }
 
