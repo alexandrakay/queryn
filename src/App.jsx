@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import SignIn from './components/SignIn'
 import TopicSelector from './pages/TopicSelector'
 import QuizScreen from './pages/QuizScreen'
+import ScoreScreen from './pages/ScoreScreen'
 
 function ModeToggle({ mode, onToggle }) {
   return (
@@ -44,6 +45,7 @@ function AppRoutes({ mode, onToggleMode }) {
       <Routes>
         <Route path="/" element={<TopicSelector />} />
         <Route path="/quiz/:topic" element={<QuizScreen />} />
+        <Route path="/score" element={<ScoreScreen />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>

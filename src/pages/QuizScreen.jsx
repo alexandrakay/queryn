@@ -67,7 +67,7 @@ export default function QuizScreen() {
 
   function handleNext() {
     if (isLast) {
-      navigate('/')
+      navigate('/score', { state: { score, total: MOCK_QUESTIONS.length, topic } })
     } else {
       setCurrentIndex(i => i + 1)
       setSelectedIndex(null)
