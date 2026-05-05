@@ -1,7 +1,13 @@
 import { createTheme } from '@mui/material'
 
 export function createAppTheme(mode) {
+  const shared = {
+    success: { main: '#4A7C59', light: '#6AAF7A', dark: '#2F5239', contrastText: '#FFFFFF' },
+    error: { main: '#9B3A3A', light: '#C05050', dark: '#6B2020', contrastText: '#FFFFFF' },
+  }
+
   const light = {
+    ...shared,
     primary: { main: '#292966', light: '#5C5C99', dark: '#1a1a44', contrastText: '#FFFFFF' },
     secondary: { main: '#5C5C99', light: '#A3A3CC', dark: '#3a3a77' },
     background: { default: '#EFEFED', paper: '#FAFAF9' },
@@ -10,6 +16,7 @@ export function createAppTheme(mode) {
   }
 
   const dark = {
+    ...shared,
     primary: { main: '#CCCCFF', light: '#E0E0FF', dark: '#A3A3CC', contrastText: '#1a1a44' },
     secondary: { main: '#A3A3CC', light: '#CCCCFF', dark: '#5C5C99' },
     background: { default: '#12122A', paper: '#1E1E40' },
