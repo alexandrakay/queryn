@@ -1,19 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-let mockGenerateQuestions = vi.fn()
-let mockGenerateSessionSummary = vi.fn()
-
-vi.mock('firebase/functions', () => ({
-  getFunctions: vi.fn(),
-  httpsCallable: vi.fn((_, name) => {
-    if (name === 'generateQuestions') return (...args) => mockGenerateQuestions(...args)
-    if (name === 'generateSessionSummary') return (...args) => mockGenerateSessionSummary(...args)
-  }),
+vi.mock('firebase/auth', () => ({
+  getAuth: vi.fn(() => ({ currentUser: { getIdToken: vi.fn().mockResolvedValue('mock-token') } })),
 }))
 
 vi.mock('../../firebase', () => ({ app: {} }))
-
-import { generateQuestions, generateSessionSummary } from '../anthropic'
 
 const MOCK_QUESTIONS = Array.from({ length: 5 }, (_, i) => ({
   question: `Question ${i + 1}`,
@@ -28,9 +19,14 @@ const MOCK_RESULTS = MOCK_QUESTIONS.map((q, i) => ({
   selectedIndex: i % 2 === 0 ? 0 : 1,
 }))
 
+import { generateQuestions, generateSessionSummary } from '../anthropic'
+
 describe('generateQuestions', () => {
   beforeEach(() => {
-    mockGenerateQuestions = vi.fn().mockResolvedValue({ data: MOCK_QUESTIONS })
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ questions: MOCK_QUESTIONS }),
+    })
   })
 
   it('returns an array of 5 questions', async () => {
@@ -49,21 +45,34 @@ describe('generateQuestions', () => {
     }
   })
 
-  it('calls the Cloud Function with the topic', async () => {
+  it('calls the function with the topic', async () => {
     await generateQuestions('Algorithms')
-    expect(mockGenerateQuestions).toHaveBeenCalledWith({ topic: 'Algorithms' })
+    const body = JSON.parse(global.fetch.mock.calls[0][1].body)
+    expect(body.topic).toBe('Algorithms')
   })
 
   it('throws if the response data is not a valid array of 5', async () => {
-    mockGenerateQuestions.mockResolvedValue({ data: [{ question: 'only one' }] })
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ questions: [{ question: 'only one' }] }),
+    })
     await expect(generateQuestions('Networks')).rejects.toThrow()
+  })
+
+  it('throws on non-ok response', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      json: () => Promise.resolve({ error: 'Must be signed in.' }),
+    })
+    await expect(generateQuestions('Networks')).rejects.toThrow('Must be signed in.')
   })
 })
 
 describe('generateSessionSummary', () => {
   beforeEach(() => {
-    mockGenerateSessionSummary = vi.fn().mockResolvedValue({
-      data: 'You did well on recursion but should review sorting algorithms.',
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ summary: 'You did well on recursion but should review sorting algorithms.' }),
     })
   })
 
@@ -73,11 +82,10 @@ describe('generateSessionSummary', () => {
     expect(summary.length).toBeGreaterThan(0)
   })
 
-  it('calls the Cloud Function with topic and results', async () => {
+  it('calls the function with topic and results', async () => {
     await generateSessionSummary('Databases', MOCK_RESULTS)
-    expect(mockGenerateSessionSummary).toHaveBeenCalledWith({
-      topic: 'Databases',
-      results: MOCK_RESULTS,
-    })
+    const body = JSON.parse(global.fetch.mock.calls[0][1].body)
+    expect(body.topic).toBe('Databases')
+    expect(body.results).toEqual(MOCK_RESULTS)
   })
 })
