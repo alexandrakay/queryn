@@ -1,12 +1,25 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from '@mui/material'
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createAppTheme } from '../../theme'
 import QuizScreen from '../QuizScreen'
 
+vi.mock('../../services/anthropic', () => ({
+  generateQuestions: vi.fn(),
+}))
+
+import { generateQuestions } from '../../services/anthropic'
+
 const theme = createAppTheme('light')
+
+const MOCK_QUESTIONS = Array.from({ length: 5 }, (_, i) => ({
+  question: `Question ${i + 1}`,
+  options: ['Option A', 'Option B', 'Option C', 'Option D'],
+  correctIndex: 1,
+  explanation: `Explanation ${i + 1}`,
+}))
 
 function renderAtRoute(topic = 'Algorithms') {
   return render(
@@ -15,6 +28,7 @@ function renderAtRoute(topic = 'Algorithms') {
         <Routes>
           <Route path="/quiz/:topic" element={<QuizScreen />} />
           <Route path="/" element={<div data-testid="topic-selector" />} />
+          <Route path="/score" element={<div data-testid="score-screen" />} />
         </Routes>
       </MemoryRouter>
     </ThemeProvider>
@@ -22,34 +36,53 @@ function renderAtRoute(topic = 'Algorithms') {
 }
 
 describe('QuizScreen — layout', () => {
-  it('displays the topic name', () => {
+  beforeEach(() => {
+    generateQuestions.mockResolvedValue(MOCK_QUESTIONS)
+  })
+
+  it('shows loading state initially', () => {
+    renderAtRoute()
+    expect(screen.getByRole('progressbar')).toBeInTheDocument()
+  })
+
+  it('displays the topic name after loading', async () => {
     renderAtRoute('Algorithms')
-    expect(screen.getByText(/Algorithms/i)).toBeInTheDocument()
+    await waitFor(() => expect(screen.getByText(/Algorithms/i)).toBeInTheDocument())
   })
 
-  it('displays a question', () => {
+  it('displays a question after loading', async () => {
     renderAtRoute()
-    expect(screen.getByTestId('question-text')).toBeInTheDocument()
+    await waitFor(() => expect(screen.getByTestId('question-text')).toBeInTheDocument())
   })
 
-  it('renders 4 answer options', () => {
+  it('renders 4 answer options after loading', async () => {
     renderAtRoute()
-    expect(screen.getAllByRole('button', { name: /option/i })).toHaveLength(4)
+    await waitFor(() => expect(screen.getAllByRole('button', { name: /option/i })).toHaveLength(4))
   })
 
-  it('shows a progress indicator', () => {
+  it('shows a progress indicator after loading', async () => {
     renderAtRoute()
-    expect(screen.getByText(/question 1 of 5/i)).toBeInTheDocument()
+    await waitFor(() => expect(screen.getByText(/question 1 of 5/i)).toBeInTheDocument())
+  })
+
+  it('shows error state when API fails', async () => {
+    generateQuestions.mockRejectedValue(new Error('API error'))
+    renderAtRoute()
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument())
   })
 })
 
 describe('QuizScreen — answer selection', () => {
+  beforeEach(() => {
+    generateQuestions.mockResolvedValue(MOCK_QUESTIONS)
+  })
+
   it('locks options after an answer is selected', async () => {
     const user = userEvent.setup()
     renderAtRoute()
-    const options = screen.getAllByRole('button', { name: /option/i })
-    await user.click(options[0])
-    for (const btn of options) {
+    await waitFor(() => screen.getAllByRole('button', { name: /option/i }))
+    await user.click(screen.getAllByRole('button', { name: /option/i })[0])
+    for (const btn of screen.getAllByRole('button', { name: /option/i })) {
       expect(btn).toBeDisabled()
     }
   })
@@ -57,6 +90,7 @@ describe('QuizScreen — answer selection', () => {
   it('shows a Next button after answering', async () => {
     const user = userEvent.setup()
     renderAtRoute()
+    await waitFor(() => screen.getAllByRole('button', { name: /option/i }))
     await user.click(screen.getAllByRole('button', { name: /option/i })[0])
     expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument()
   })
@@ -64,6 +98,7 @@ describe('QuizScreen — answer selection', () => {
   it('shows an explanation after answering', async () => {
     const user = userEvent.setup()
     renderAtRoute()
+    await waitFor(() => screen.getAllByRole('button', { name: /option/i }))
     await user.click(screen.getAllByRole('button', { name: /option/i })[0])
     expect(screen.getByTestId('explanation')).toBeInTheDocument()
   })
@@ -71,6 +106,7 @@ describe('QuizScreen — answer selection', () => {
   it('advances to the next question on Next click', async () => {
     const user = userEvent.setup()
     renderAtRoute()
+    await waitFor(() => screen.getAllByRole('button', { name: /option/i }))
     await user.click(screen.getAllByRole('button', { name: /option/i })[0])
     await user.click(screen.getByRole('button', { name: /next/i }))
     expect(screen.getByText(/question 2 of 5/i)).toBeInTheDocument()
@@ -79,9 +115,9 @@ describe('QuizScreen — answer selection', () => {
   it('increments score when correct answer is selected', async () => {
     const user = userEvent.setup()
     renderAtRoute()
-    // First question correctIndex is 1 (O(log n))
-    const options = screen.getAllByRole('button', { name: /option/i })
-    await user.click(options[1])
+    await waitFor(() => screen.getAllByRole('button', { name: /option/i }))
+    // correctIndex is 1
+    await user.click(screen.getAllByRole('button', { name: /option/i })[1])
     expect(screen.getByTestId('score')).toHaveTextContent('1')
   })
 })
