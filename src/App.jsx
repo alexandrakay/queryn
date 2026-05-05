@@ -1,13 +1,29 @@
 import { useState, useMemo } from 'react'
-import { ThemeProvider, CssBaseline, Box, CircularProgress, Typography, Button, IconButton, Tooltip } from '@mui/material'
+import { ThemeProvider, CssBaseline, Box, CircularProgress, IconButton, Tooltip } from '@mui/material'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import LightModeIcon from '@mui/icons-material/LightMode'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { createAppTheme } from './theme'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import SignIn from './components/SignIn'
+import TopicSelector from './pages/TopicSelector'
 
-function AppContent({ onToggleMode, mode }) {
-  const { user, loading, signOut } = useAuth()
+function ModeToggle({ mode, onToggle }) {
+  return (
+    <Tooltip title={mode === 'light' ? 'Dark mode' : 'Light mode'}>
+      <IconButton
+        onClick={onToggle}
+        color="primary"
+        sx={{ position: 'fixed', top: 12, right: 12 }}
+      >
+        {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
+      </IconButton>
+    </Tooltip>
+  )
+}
+
+function AppRoutes({ mode, onToggleMode }) {
+  const { user, loading } = useAuth()
 
   if (loading) {
     return (
@@ -22,24 +38,14 @@ function AppContent({ onToggleMode, mode }) {
   }
 
   return (
-    <Box sx={{ p: 4, textAlign: 'center', mt: 8 }}>
-      <Typography variant="h4" color="primary" gutterBottom>
-        queryn
-      </Typography>
-      <Typography variant="body1" color="text.secondary" gutterBottom>
-        Welcome, {user.displayName}
-      </Typography>
-      <Box sx={{ mt: 2, display: 'flex', gap: 2, justifyContent: 'center', alignItems: 'center' }}>
-        <Button variant="outlined" onClick={signOut}>
-          Sign out
-        </Button>
-        <Tooltip title={mode === 'light' ? 'Dark mode' : 'Light mode'}>
-          <IconButton onClick={onToggleMode} color="primary">
-            {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
-          </IconButton>
-        </Tooltip>
-      </Box>
-    </Box>
+    <>
+      <ModeToggle mode={mode} onToggle={onToggleMode} />
+      <Routes>
+        <Route path="/" element={<TopicSelector />} />
+        <Route path="/quiz/:topic" element={<div>Quiz screen coming soon</div>} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
   )
 }
 
@@ -51,9 +57,11 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AuthProvider>
-        <AppContent onToggleMode={toggleMode} mode={mode} />
-      </AuthProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <AppRoutes mode={mode} onToggleMode={toggleMode} />
+        </AuthProvider>
+      </BrowserRouter>
     </ThemeProvider>
   )
 }
