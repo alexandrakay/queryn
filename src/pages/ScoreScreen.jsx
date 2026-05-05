@@ -19,16 +19,16 @@ export default function ScoreScreen() {
       return
     }
     generateSessionSummary(topic, results)
-      .then(async (summary) => {
+      .then(summary => {
         setAiFeedback(summary)
         if (user) {
-          await saveSession(user.uid, {
+          saveSession(user.uid, {
             topic,
             score,
             totalQuestions: total,
             aiFeedback: summary,
             questions: results,
-          })
+          }).catch(() => {})
         }
       })
       .catch(() => setAiFeedback('Unable to generate summary. Please try again.'))
