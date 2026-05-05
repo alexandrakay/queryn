@@ -1,26 +1,44 @@
 import { useState, useMemo } from 'react'
-import { ThemeProvider, CssBaseline, Box, CircularProgress, IconButton, Tooltip } from '@mui/material'
+import { ThemeProvider, CssBaseline, Box, CircularProgress, IconButton, Tooltip, AppBar, Toolbar, Button } from '@mui/material'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import LightModeIcon from '@mui/icons-material/LightMode'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import HistoryIcon from '@mui/icons-material/History'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { createAppTheme } from './theme'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import SignIn from './components/SignIn'
 import TopicSelector from './pages/TopicSelector'
 import QuizScreen from './pages/QuizScreen'
 import ScoreScreen from './pages/ScoreScreen'
+import HistoryScreen from './pages/HistoryScreen'
 
-function ModeToggle({ mode, onToggle }) {
+function Nav({ mode, onToggle }) {
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const onQuiz = pathname.startsWith('/quiz')
+
+  if (onQuiz) return null
+
   return (
-    <Tooltip title={mode === 'light' ? 'Dark mode' : 'Light mode'}>
-      <IconButton
-        onClick={onToggle}
-        color="primary"
-        sx={{ position: 'fixed', top: 12, right: 12 }}
-      >
-        {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
-      </IconButton>
-    </Tooltip>
+    <AppBar position="static" color="transparent" elevation={0} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
+        <Button color="primary" onClick={() => navigate('/')} sx={{ fontFamily: '"Fugaz One", sans-serif', fontSize: '1.1rem' }}>
+          queryn
+        </Button>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Tooltip title="History">
+            <IconButton color="primary" onClick={() => navigate('/history')}>
+              <HistoryIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={mode === 'light' ? 'Dark mode' : 'Light mode'}>
+            <IconButton onClick={onToggle} color="primary">
+              {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
+            </IconButton>
+          </Tooltip>
+        </Box>
+      </Toolbar>
+    </AppBar>
   )
 }
 
@@ -41,11 +59,12 @@ function AppRoutes({ mode, onToggleMode }) {
 
   return (
     <>
-      <ModeToggle mode={mode} onToggle={onToggleMode} />
+      <Nav mode={mode} onToggle={onToggleMode} />
       <Routes>
         <Route path="/" element={<TopicSelector />} />
         <Route path="/quiz/:topic" element={<QuizScreen />} />
         <Route path="/score" element={<ScoreScreen />} />
+        <Route path="/history" element={<HistoryScreen />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
