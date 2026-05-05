@@ -17,7 +17,7 @@ export default function SignIn({ onToggleMode, mode }) {
         bgcolor: 'background.default',
       }}
     >
-      <Box sx={{ position: 'fixed', top: 16, right: 16 }}>
+      <Box sx={{ position: 'fixed', top: 12, right: 12 }}>
         <Tooltip title={mode === 'light' ? 'Dark mode' : 'Light mode'}>
           <IconButton onClick={onToggleMode} color="primary">
             {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
