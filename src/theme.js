@@ -24,6 +24,10 @@ export function createAppTheme(mode) {
     divider: 'rgba(204,204,255,0.12)',
   }
 
+  const cardShadow = mode === 'light'
+    ? '0 2px 8px rgba(41,41,102,0.08), 0 1px 2px rgba(41,41,102,0.06)'
+    : '0 2px 8px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3)'
+
   return createTheme({
     palette: { mode, ...(mode === 'light' ? light : dark) },
     typography: {
@@ -36,20 +40,62 @@ export function createAppTheme(mode) {
       h6: { fontFamily: '"Fugaz One", sans-serif' },
       button: { fontWeight: 600, letterSpacing: '0.01em' },
     },
-    shape: { borderRadius: 0 },
+    shape: { borderRadius: 12 },
     components: {
       MuiCard: {
         styleOverrides: {
           root: {
             backgroundImage: 'none',
             border: mode === 'light' ? '1px solid #D6D3D1' : '1px solid rgba(204,204,255,0.12)',
-            boxShadow: 'none',
+            boxShadow: cardShadow,
+            transition: 'box-shadow 0.2s ease, transform 0.15s ease',
+          },
+        },
+      },
+      MuiCardActionArea: {
+        styleOverrides: {
+          root: {
+            '&:hover': {
+              '& .MuiCardContent-root': {
+                transform: 'translateY(-1px)',
+              },
+            },
+          },
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: 8,
+          },
+          contained: {
+            boxShadow: mode === 'light'
+              ? '0 2px 6px rgba(41,41,102,0.2)'
+              : '0 2px 6px rgba(0,0,0,0.4)',
+            '&:hover': {
+              boxShadow: mode === 'light'
+                ? '0 4px 12px rgba(41,41,102,0.28)'
+                : '0 4px 12px rgba(0,0,0,0.5)',
+            },
           },
         },
       },
       MuiDivider: {
         styleOverrides: {
           root: { borderColor: mode === 'light' ? '#D6D3D1' : 'rgba(204,204,255,0.12)' },
+        },
+      },
+      MuiLinearProgress: {
+        styleOverrides: {
+          root: { borderRadius: 4 },
+        },
+      },
+      MuiAccordion: {
+        styleOverrides: {
+          root: {
+            borderRadius: '12px !important',
+            overflow: 'hidden',
+          },
         },
       },
     },
