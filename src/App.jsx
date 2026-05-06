@@ -6,7 +6,7 @@ import HistoryIcon from '@mui/icons-material/History'
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { createAppTheme } from './theme'
 import { AuthProvider, useAuth } from './context/AuthContext'
-import SignIn from './components/SignIn'
+import LandingPage from './pages/LandingPage'
 import TopicSelector from './pages/TopicSelector'
 import QuizScreen from './pages/QuizScreen'
 import ScoreScreen from './pages/ScoreScreen'
@@ -54,7 +54,7 @@ function AppRoutes({ mode, onToggleMode }) {
   }
 
   if (!user) {
-    return <SignIn onToggleMode={onToggleMode} mode={mode} />
+    return <LandingPage onToggleMode={onToggleMode} mode={mode} />
   }
 
   return (
