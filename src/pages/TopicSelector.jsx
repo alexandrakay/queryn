@@ -28,23 +28,48 @@ export default function TopicSelector() {
   const navigate = useNavigate()
 
   return (
-    <Box sx={{ p: 4, maxWidth: 900, mx: 'auto' }}>
-      <Typography variant="h4" color="primary" gutterBottom sx={{ mb: 1 }}>
-        queryn
-      </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-        Choose a topic to get started.
-      </Typography>
-      <Grid container spacing={2}>
+    <Box sx={{ p: { xs: 3, sm: 4 }, maxWidth: 960, mx: 'auto' }}>
+      <Box sx={{ mb: 5 }}>
+        <Typography variant="h3" color="primary" sx={{ mb: 0.5 }}>
+          Pick a topic
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          5 AI-generated questions, instant feedback, personalized summary.
+        </Typography>
+      </Box>
+
+      <Grid container spacing={2.5}>
         {TOPICS.map(({ label, icon: Icon }) => (
           <Grid item xs={12} sm={6} md={4} key={label}>
             <Card
-              sx={{ height: '100%' }}
+              sx={{
+                height: '100%',
+                '&:hover': {
+                  boxShadow: theme => `0 8px 24px ${theme.palette.mode === 'light' ? 'rgba(41,41,102,0.16)' : 'rgba(0,0,0,0.6)'}`,
+                  transform: 'translateY(-2px)',
+                },
+                transition: 'box-shadow 0.2s ease, transform 0.15s ease',
+              }}
               onClick={() => navigate(`/quiz/${encodeURIComponent(label)}`)}
             >
               <CardActionArea sx={{ height: '100%' }}>
-                <CardContent sx={{ textAlign: 'center', py: 4 }}>
-                  <Icon sx={{ fontSize: 40, color: 'primary.main', mb: 1.5 }} />
+                <CardContent sx={{ textAlign: 'center', py: 4.5, px: 3 }}>
+                  <Box
+                    sx={{
+                      width: 56,
+                      height: 56,
+                      borderRadius: '50%',
+                      bgcolor: 'primary.main',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mx: 'auto',
+                      mb: 2,
+                      opacity: 0.9,
+                    }}
+                  >
+                    <Icon sx={{ fontSize: 28, color: 'primary.contrastText' }} />
+                  </Box>
                   <Typography variant="h6" fontFamily='"Fugaz One", sans-serif'>
                     {label}
                   </Typography>

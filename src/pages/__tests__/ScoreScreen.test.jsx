@@ -36,7 +36,8 @@ function renderAtRoute({ score = 3, total = 5, topic = 'Algorithms', results = [
 describe('ScoreScreen', () => {
   it('displays the score', () => {
     renderAtRoute({ score: 3, total: 5 })
-    expect(screen.getByText(/3 out of 5/i)).toBeInTheDocument()
+    expect(screen.getByText('3')).toBeInTheDocument()
+    expect(screen.getByText('/5')).toBeInTheDocument()
   })
 
   it('displays the topic name', () => {
