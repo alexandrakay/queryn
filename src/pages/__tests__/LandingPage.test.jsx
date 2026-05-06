@@ -55,4 +55,10 @@ describe('LandingPage', () => {
     renderLandingPage()
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
   })
+
+  it('keeps ornamental preview purely decorative for assistive tech', () => {
+    renderLandingPage()
+    const cluster = screen.getByTestId('landing-decoration-cluster')
+    expect(cluster).toHaveAttribute('aria-hidden', 'true')
+  })
 })
