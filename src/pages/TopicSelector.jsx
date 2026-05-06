@@ -9,6 +9,8 @@ import FunctionsIcon from '@mui/icons-material/Functions'
 import ShowChartIcon from '@mui/icons-material/ShowChart'
 import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions'
 import CalculateIcon from '@mui/icons-material/Calculate'
+import CodeIcon from '@mui/icons-material/Code'
+import SmartToyIcon from '@mui/icons-material/SmartToy'
 import { useNavigate } from 'react-router-dom'
 
 const TOPICS = [
@@ -22,6 +24,8 @@ const TOPICS = [
   { label: 'Derivatives', icon: FunctionsIcon },
   { label: 'Integrals', icon: IntegrationInstructionsIcon },
   { label: 'Differential Equations', icon: CalculateIcon },
+  { label: 'Java Development', icon: CodeIcon },
+  { label: 'AI / Machine Learning', icon: SmartToyIcon },
 ]
 
 export default function TopicSelector() {

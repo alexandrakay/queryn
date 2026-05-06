@@ -8,7 +8,7 @@ AI-powered CS quiz prep for WGU students.
 
 ## What it does
 
-queryn generates on-demand multiple choice quizzes across 10 core Computer Science topics using Claude Haiku. Answer a question, get an instant AI explanation, finish the session, and receive a personalized performance summary — all saved to your history.
+queryn generates on-demand multiple choice quizzes across 12 core Computer Science topics using Claude Haiku. Answer a question, get an instant AI explanation, finish the session, and receive a personalized performance summary — all saved to your history.
 
 ---
 
@@ -26,6 +26,8 @@ queryn generates on-demand multiple choice quizzes across 10 core Computer Scien
 | 8 | Derivatives |
 | 9 | Integrals |
 | 10 | Differential Equations |
+| 11 | Java Development |
+| 12 | AI / Machine Learning |
 
 ---
 
@@ -51,7 +53,7 @@ Sign in → Pick topic → 5 AI questions → Answer + explanation → Score + A
 ```
 
 1. User signs in with Google
-2. Selects one of 10 topic cards
+2. Selects one of 12 topic cards
 3. Cloud Function calls Claude Haiku → returns 5 MCQs as JSON
 4. User answers one question at a time with immediate correct/incorrect feedback
 5. Each answer reveals an AI-generated explanation
