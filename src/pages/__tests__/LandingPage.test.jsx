@@ -50,4 +50,9 @@ describe('LandingPage', () => {
     await user.click(screen.getByRole('button', { name: /dark mode/i }))
     expect(onToggleMode).toHaveBeenCalledOnce()
   })
+
+  it('has an h1 hero headline', () => {
+    renderLandingPage()
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
+  })
 })
