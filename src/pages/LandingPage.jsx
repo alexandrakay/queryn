@@ -27,10 +27,10 @@ function TopicPill({ children, lit = false }) {
         border: '1px solid',
         borderColor: lit ? '#1a2d4a' : '#222',
         borderRadius: 1,
-        px: '10px',
-        py: '5px',
+        px: { md: '13px', lg: '15px' },
+        py: { md: '7px', lg: '8px' },
         fontFamily: mono,
-        fontSize: 10,
+        fontSize: { md: 12, lg: 13 },
         color: lit ? accent : '#ffffff',
         letterSpacing: '0.06em',
         whiteSpace: 'nowrap',
@@ -119,7 +119,7 @@ export default function LandingPage({ onToggleMode, mode }) {
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: '3vw',
+            gap: { xs: '3vw', md: '4vw', lg: '5vw' },
             flex: 1,
             flexDirection: { xs: 'column', md: 'row' },
           }}
@@ -156,7 +156,7 @@ export default function LandingPage({ onToggleMode, mode }) {
               }}
             >
               Ace every
-              <br />
+             
               CS
               <br />
               <Box component="em" sx={{ color: accent, fontStyle: 'normal' }}>
@@ -201,66 +201,68 @@ export default function LandingPage({ onToggleMode, mode }) {
           </Box>
 
           <Stack
-            gap="12px"
+            data-testid="landing-decoration-cluster"
+            aria-hidden="true"
+            gap={{ md: '16px', lg: '22px' }}
             sx={{
               display: { xs: 'none', md: 'flex' },
-              alignItems: 'flex-start',
+              alignItems: 'flex-end',
               flexShrink: 0,
-              width: { md: '40vw', lg: '36vw' },
-              maxWidth: 460,
-              overflow: 'hidden',
+              width: { md: '42vw', lg: '40vw', xl: '38vw' },
+              maxWidth: { md: 520, lg: 600 },
+              overflow: 'visible',
             }}
           >
-            <Stack direction="row" gap="10px" alignItems="center">
+            <Stack direction="row" gap={{ md: '12px', lg: '16px' }} alignItems="center">
               <TopicPill lit>/ data structures</TopicPill>
-              <Block sx={{ width: 100, height: 80 }}>
-                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 8px)', gap: '6px', opacity: 0.15 }}>
+              <Block sx={{ width: { md: 126, lg: 140 }, height: { md: 102, lg: 112 } }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 10px)', gap: { md: '8px', lg: '9px' }, opacity: 0.2 }}>
                   {DOTS.map((_, i) => (
-                    <Box key={i} sx={{ width: 3, height: 3, borderRadius: '50%', bgcolor: '#f5f5f0' }} />
+                    <Box key={i} sx={{ width: { md: 4, lg: 5 }, height: { md: 4, lg: 5 }, borderRadius: '50%', bgcolor: '#f5f5f0' }} />
                   ))}
                 </Box>
               </Block>
             </Stack>
 
-            <Stack direction="row" gap="10px" alignItems="center">
-              <Block sx={{ width: 110, height: 110 }}>
+            <Stack direction="row" gap={{ md: '12px', lg: '16px' }} alignItems="center">
+              <Block sx={{ width: { md: 138, lg: 152 }, height: { md: 138, lg: 152 } }}>
                 <Stack alignItems="center" justifyContent="center" gap="2px">
-                  <Typography sx={{ fontFamily: display, fontSize: 26, fontWeight: 800, color: accent, letterSpacing: '-0.5px' }}>
+                  <Typography sx={{ fontFamily: display, fontSize: { md: 34, lg: 40 }, fontWeight: 800, color: accent, letterSpacing: '-0.5px' }}>
                     12
                   </Typography>
-                  <Typography sx={{ fontFamily: mono, fontSize: 10, color: '#333', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                  <Typography sx={{ fontFamily: mono, fontSize: { md: 11.5, lg: 12.5 }, color: '#333', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                     topics
                   </Typography>
                 </Stack>
               </Block>
 
-              <Block accentBlock sx={{ width: 88, height: 88 }}>
-                <Box component="svg" width={36} height={36} viewBox="0 0 28 28" fill="none">
-                  <circle cx="14" cy="14" r="10" stroke={accent} strokeWidth="1" opacity="0.5" />
-                  <circle cx="14" cy="14" r="5" stroke={accent} strokeWidth="1" opacity="0.35" />
-                  <circle cx="14" cy="14" r="2" fill={accent} opacity="0.8" />
+              <Block accentBlock sx={{ width: { md: 108, lg: 120 }, height: { md: 108, lg: 120 } }}>
+                <Box component="svg" sx={{ width: { md: 44, lg: 50 }, height: { md: 44, lg: 50 } }} viewBox="0 0 28 28" fill="none">
+                  <circle cx="14" cy="14" r="10" stroke={accent} strokeWidth="1.25" opacity="0.55" />
+                  <circle cx="14" cy="14" r="5" stroke={accent} strokeWidth="1.25" opacity="0.38" />
+                  <circle cx="14" cy="14" r="2" fill={accent} opacity="0.85" />
                 </Box>
               </Block>
 
-              <Block sx={{ width: 76, height: 76 }}>
-                <Box component="svg" width={28} height={28} viewBox="0 0 24 24" fill="none">
-                  <polyline points="3,18 7,10 12,14 18,5 22,8" stroke={accent} strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.7" />
+              <Block sx={{ width: { md: 96, lg: 104 }, height: { md: 96, lg: 104 } }}>
+                <Box component="svg" sx={{ width: { md: 38, lg: 42 }, height: { md: 38, lg: 42 } }} viewBox="0 0 24 24" fill="none">
+                  <polyline points="3,18 7,10 12,14 18,5 22,8" stroke={accent} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.78" />
                 </Box>
               </Block>
             </Stack>
 
-            <Stack direction="row" gap="10px" alignItems="center">
+            <Stack direction="row" gap={{ md: '12px', lg: '14px' }} alignItems="center">
               <TopicPill>algorithms</TopicPill>
               <TopicPill>os</TopicPill>
               <TopicPill>networks</TopicPill>
             </Stack>
 
-            <Stack direction="row" gap="10px" alignItems="center">
+            <Stack direction="row" gap={{ md: '12px', lg: '14px' }} alignItems="center">
               <TopicPill>discrete math</TopicPill>
               <TopicPill lit>ai / ml</TopicPill>
             </Stack>
 
-            <Typography sx={{ fontFamily: mono, fontSize: 10, color: '#D3D3D3', letterSpacing: '0.08em', mt: '4px' }}>
+            <Typography sx={{ fontFamily: mono, fontSize: { md: 11.5, lg: 12.5 }, color: '#D3D3D3', letterSpacing: '0.08em', mt: '4px' }}>
               instant explanations →
             </Typography>
           </Stack>
