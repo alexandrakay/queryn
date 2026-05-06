@@ -1,18 +1,44 @@
 import { useState, useEffect } from 'react'
-import { Box, Card, CardContent, Typography, Button, LinearProgress, Stack, CircularProgress, Alert } from '@mui/material'
+import { Box, Card, CardContent, Typography, Button, LinearProgress, Stack, CircularProgress, Alert, useTheme } from '@mui/material'
 import { useParams, useNavigate } from 'react-router-dom'
 import { generateQuestions } from '../services/anthropic'
 
-function optionSx(i, selectedIndex, correctIndex) {
+function optionSx(i, selectedIndex, correctIndex, isDark) {
   if (selectedIndex === null) return {}
-  if (i === correctIndex) return { borderColor: '#4A7C59', color: '#4A7C59', bgcolor: '#4A7C5912' }
-  if (i === selectedIndex) return { borderColor: '#9B3A3A', color: '#9B3A3A', bgcolor: '#9B3A3A12' }
+  const correctSx = {
+    borderColor: '#22c55e',
+    borderWidth: 2,
+    color: '#22c55e',
+    bgcolor: isDark ? 'rgba(34,197,94,0.22)' : 'rgba(34,197,94,0.14)',
+    '&.Mui-disabled': {
+      borderColor: '#22c55e',
+      borderWidth: 2,
+      color: '#22c55e',
+      bgcolor: isDark ? 'rgba(34,197,94,0.22)' : 'rgba(34,197,94,0.14)',
+    },
+  }
+  const wrongSx = {
+    borderColor: '#ef4444',
+    borderWidth: 2,
+    color: '#ef4444',
+    bgcolor: isDark ? 'rgba(239,68,68,0.22)' : 'rgba(239,68,68,0.14)',
+    '&.Mui-disabled': {
+      borderColor: '#ef4444',
+      borderWidth: 2,
+      color: '#ef4444',
+      bgcolor: isDark ? 'rgba(239,68,68,0.22)' : 'rgba(239,68,68,0.14)',
+    },
+  }
+  if (i === correctIndex) return correctSx
+  if (i === selectedIndex) return wrongSx
   return {}
 }
 
 export default function QuizScreen() {
   const { topic } = useParams()
   const navigate = useNavigate()
+  const theme = useTheme()
+  const isDark = theme.palette.mode === 'dark'
   const [questions, setQuestions] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -94,7 +120,7 @@ export default function QuizScreen() {
             disabled={answered}
             fullWidth
             aria-label={`option ${i + 1}`}
-            sx={{ justifyContent: 'flex-start', py: 1.5, px: 2, textTransform: 'none', ...optionSx(i, selectedIndex, question.correctIndex) }}
+            sx={{ justifyContent: 'flex-start', py: 1.5, px: 2, textTransform: 'none', ...optionSx(i, selectedIndex, question.correctIndex, isDark) }}
             onClick={() => handleSelect(i)}
           >
             <Typography variant="body1">{option}</Typography>

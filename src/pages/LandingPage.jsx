@@ -1,29 +1,20 @@
+import './LandingPage.css'
 import { useAuth } from '../context/AuthContext'
 
 const s = {
   page: {
-    boxSizing: 'border-box',
     background: '#0d0d0d',
     minHeight: '100vh',
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '40px 20px',
+    flexDirection: 'column',
     fontFamily: "'DM Mono', monospace",
-  },
-  inner: {
-    background: '#0d0d0d',
-    width: '100%',
-    maxWidth: 900,
-    padding: '36px 44px 48px',
-    position: 'relative',
     overflow: 'hidden',
   },
   topbar: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 52,
+    marginBottom: '6vh',
   },
   logo: {
     fontFamily: "'DM Mono', monospace",
@@ -44,16 +35,6 @@ const s = {
     cursor: 'pointer',
     color: '#4a4a4a',
     fontSize: 16,
-  },
-  bodyWrap: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: 32,
-  },
-  left: {
-    flex: 1,
-    maxWidth: 520,
   },
   tag: {
     display: 'inline-flex',
@@ -80,26 +61,9 @@ const s = {
     borderRadius: 1,
     marginBottom: 16,
   },
-  headline: {
-    fontFamily: "'Syne', sans-serif",
-    fontSize: 58,
-    fontWeight: 800,
-    lineHeight: 1.0,
-    color: '#f5f5f0',
-    letterSpacing: '-2px',
-    marginBottom: 22,
-  },
   headlineAccent: {
     color: '#60a5fa',
     fontStyle: 'normal',
-  },
-  bodyText: {
-    fontFamily: "'DM Mono', monospace",
-    fontSize: 12.5,
-    lineHeight: 1.8,
-    color: '#5a5a5a',
-    maxWidth: 400,
-    marginBottom: 36,
   },
   cta: {
     display: 'inline-flex',
@@ -117,19 +81,6 @@ const s = {
     border: 'none',
     textTransform: 'uppercase',
   },
-  right: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 10,
-    alignItems: 'flex-end',
-    paddingTop: 8,
-    flexShrink: 0,
-  },
-  decoRow: {
-    display: 'flex',
-    gap: 10,
-    alignItems: 'center',
-  },
   block: {
     borderRadius: 6,
     display: 'flex',
@@ -137,14 +88,8 @@ const s = {
     justifyContent: 'center',
     flexShrink: 0,
   },
-  bDark: {
-    background: '#141414',
-    border: '1px solid #222',
-  },
-  bAccent: {
-    background: '#0a0f1a',
-    border: '1px solid #1a2d4a',
-  },
+  bDark: { background: '#141414', border: '1px solid #222' },
+  bAccent: { background: '#0a0f1a', border: '1px solid #1a2d4a' },
   topicPill: {
     background: '#141414',
     border: '1px solid #222',
@@ -156,22 +101,14 @@ const s = {
     letterSpacing: '0.06em',
     whiteSpace: 'nowrap',
   },
-  topicPillLit: {
-    color: '#60a5fa',
-    borderColor: '#1a2d4a',
-  },
+  topicPillLit: { color: '#60a5fa', borderColor: '#1a2d4a' },
   dotGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(4, 8px)',
     gap: 6,
     opacity: 0.15,
   },
-  dot: {
-    width: 3,
-    height: 3,
-    borderRadius: '50%',
-    background: '#f5f5f0',
-  },
+  dot: { width: 3, height: 3, borderRadius: '50%', background: '#f5f5f0' },
   statNum: {
     fontFamily: "'Syne', sans-serif",
     fontSize: 26,
@@ -203,7 +140,7 @@ export default function LandingPage({ onToggleMode, mode }) {
 
   return (
     <div style={s.page}>
-      <div style={s.inner}>
+      <div className="lp-inner">
         <div style={s.topbar}>
           <span style={s.logo}>queryn</span>
           <button
@@ -215,19 +152,19 @@ export default function LandingPage({ onToggleMode, mode }) {
           </button>
         </div>
 
-        <div style={s.bodyWrap}>
-          <div style={s.left}>
+        <div className="lp-body-wrap">
+          <div className="lp-left">
             <div style={s.tag}>
               <span style={s.tagDot} />
               AI quiz engine — CS
             </div>
             <div style={s.lineAccent} />
-            <h1 style={s.headline}>
+            <h1 className="lp-headline">
               Ace every<br />
               CS<br />
               <em style={s.headlineAccent}>assessment.</em>
             </h1>
-            <p style={s.bodyText}>
+            <p className="lp-body-text">
               AI-generated quizzes across 10 core CS topics. Answer, get instant explanations, and walk away knowing exactly what to review.
             </p>
             <button style={s.cta} onClick={signInWithGoogle}>
@@ -241,52 +178,50 @@ export default function LandingPage({ onToggleMode, mode }) {
             </button>
           </div>
 
-          <div style={s.right}>
-            <div style={s.decoRow}>
+          <div className="lp-right">
+            <div className="lp-deco-row">
               <span style={{ ...s.topicPill, ...s.topicPillLit }}>/ data structures</span>
-              <div style={{ ...s.block, ...s.bDark, width: 72, height: 60 }}>
+              <div style={{ ...s.block, ...s.bDark, width: 100, height: 80 }}>
                 <div style={s.dotGrid}>
                   {DOTS.map((_, i) => <div key={i} style={s.dot} />)}
                 </div>
               </div>
             </div>
 
-            <div style={s.decoRow}>
-              <div style={{ ...s.block, ...s.bDark, width: 80, height: 80 }}>
+            <div className="lp-deco-row">
+              <div style={{ ...s.block, ...s.bDark, width: 110, height: 110 }}>
                 <div style={s.gridBlock}>
                   <div style={s.statNum}>10</div>
                   <div style={s.statLabel}>topics</div>
                 </div>
               </div>
-              <div style={{ ...s.block, ...s.bAccent, width: 64, height: 64 }}>
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <div style={{ ...s.block, ...s.bAccent, width: 88, height: 88 }}>
+                <svg width="36" height="36" viewBox="0 0 28 28" fill="none">
                   <circle cx="14" cy="14" r="10" stroke="#60a5fa" strokeWidth="1" opacity="0.5" />
                   <circle cx="14" cy="14" r="5" stroke="#60a5fa" strokeWidth="1" opacity="0.35" />
                   <circle cx="14" cy="14" r="2" fill="#60a5fa" opacity="0.8" />
                 </svg>
               </div>
-              <div style={{ ...s.block, ...s.bDark, width: 56, height: 56 }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <div style={{ ...s.block, ...s.bDark, width: 76, height: 76 }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                   <polyline points="3,18 7,10 12,14 18,5 22,8" stroke="#60a5fa" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.7" />
                 </svg>
               </div>
             </div>
 
-            <div style={{ ...s.decoRow, gap: 8 }}>
+            <div className="lp-deco-row">
               <span style={s.topicPill}>algorithms</span>
               <span style={s.topicPill}>os</span>
               <span style={s.topicPill}>networks</span>
             </div>
 
-            <div style={{ ...s.decoRow, gap: 8, justifyContent: 'flex-end' }}>
+            <div className="lp-deco-row lp-deco-row--end">
               <span style={s.topicPill}>discrete math</span>
               <span style={{ ...s.topicPill, ...s.topicPillLit }}>ai / ml</span>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
-              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: '#2a2a2a', letterSpacing: '0.08em' }}>
-                instant explanations →
-              </span>
+            <div className="lp-deco-footer">
+              instant explanations →
             </div>
           </div>
         </div>
