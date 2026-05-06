@@ -28,9 +28,9 @@ describe('LandingPage', () => {
     expect(screen.getByText('queryn')).toBeInTheDocument()
   })
 
-  it('communicates the app purpose for WGU students', () => {
+  it('communicates the app purpose', () => {
     renderLandingPage()
-    expect(screen.getByText(/WGU/i)).toBeInTheDocument()
+    expect(screen.getByText(/CS topics/i)).toBeInTheDocument()
   })
 
   it('has a Sign in with Google CTA button', () => {

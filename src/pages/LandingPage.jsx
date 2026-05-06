@@ -1,153 +1,296 @@
-import { Box, Button, Typography, IconButton, Tooltip, Grid } from '@mui/material'
-import GoogleIcon from '@mui/icons-material/Google'
-import DarkModeIcon from '@mui/icons-material/DarkMode'
-import LightModeIcon from '@mui/icons-material/LightMode'
-import DataObjectIcon from '@mui/icons-material/DataObject'
-import AccountTreeIcon from '@mui/icons-material/AccountTree'
-import MemoryIcon from '@mui/icons-material/Memory'
-import StorageIcon from '@mui/icons-material/Storage'
-import LanIcon from '@mui/icons-material/Lan'
-import ArchitectureIcon from '@mui/icons-material/Architecture'
-import FunctionsIcon from '@mui/icons-material/Functions'
-import ShowChartIcon from '@mui/icons-material/ShowChart'
 import { useAuth } from '../context/AuthContext'
 
-const TILES = [
-  { icon: DataObjectIcon, bg: '#4B4B8F' },
-  { icon: AccountTreeIcon, bg: '#2E2E6B' },
-  { icon: MemoryIcon, bg: '#5C5C99' },
-  { icon: StorageIcon, bg: '#3A3A7A' },
-  { icon: LanIcon, bg: '#6B6BAA' },
-  { icon: ArchitectureIcon, bg: '#2A2A60' },
-  { icon: FunctionsIcon, bg: '#4A4A85' },
-  { icon: ShowChartIcon, bg: '#393980' },
-]
-
-function IconTileGrid() {
-  return (
-    <Box
-      sx={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: 1.5,
-        maxWidth: 320,
-        mx: 'auto',
-      }}
-    >
-      {TILES.map(({ icon: Icon, bg }, i) => (
-        <Box
-          key={i}
-          sx={{
-            bgcolor: bg,
-            borderRadius: 3,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            aspectRatio: '1',
-            opacity: 0.92,
-            transform: i % 3 === 1 ? 'translateY(10px)' : i % 3 === 2 ? 'translateY(-6px)' : 'none',
-          }}
-        >
-          <Icon sx={{ fontSize: 36, color: 'rgba(255,255,255,0.85)' }} />
-        </Box>
-      ))}
-    </Box>
-  )
+const s = {
+  page: {
+    boxSizing: 'border-box',
+    background: '#0d0d0d',
+    minHeight: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '40px 20px',
+    fontFamily: "'DM Mono', monospace",
+  },
+  inner: {
+    background: '#0d0d0d',
+    width: '100%',
+    maxWidth: 900,
+    padding: '36px 44px 48px',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  topbar: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 52,
+  },
+  logo: {
+    fontFamily: "'DM Mono', monospace",
+    fontSize: 11,
+    letterSpacing: '0.18em',
+    color: '#3a3a3a',
+    textTransform: 'uppercase',
+  },
+  themeBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: '50%',
+    border: '1px solid #2a2a2a',
+    background: '#1a1a1a',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    color: '#4a4a4a',
+    fontSize: 16,
+  },
+  bodyWrap: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: 32,
+  },
+  left: {
+    flex: 1,
+    maxWidth: 520,
+  },
+  tag: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 7,
+    fontSize: 11,
+    color: '#3d3d3d',
+    letterSpacing: '0.1em',
+    textTransform: 'uppercase',
+    marginBottom: 18,
+  },
+  tagDot: {
+    width: 6,
+    height: 6,
+    borderRadius: '50%',
+    background: '#60a5fa',
+    display: 'inline-block',
+    flexShrink: 0,
+  },
+  lineAccent: {
+    width: 32,
+    height: 2,
+    background: '#60a5fa',
+    borderRadius: 1,
+    marginBottom: 16,
+  },
+  headline: {
+    fontFamily: "'Syne', sans-serif",
+    fontSize: 58,
+    fontWeight: 800,
+    lineHeight: 1.0,
+    color: '#f5f5f0',
+    letterSpacing: '-2px',
+    marginBottom: 22,
+  },
+  headlineAccent: {
+    color: '#60a5fa',
+    fontStyle: 'normal',
+  },
+  bodyText: {
+    fontFamily: "'DM Mono', monospace",
+    fontSize: 12.5,
+    lineHeight: 1.8,
+    color: '#5a5a5a',
+    maxWidth: 400,
+    marginBottom: 36,
+  },
+  cta: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 12,
+    background: '#60a5fa',
+    color: '#0d0d0d',
+    fontFamily: "'DM Mono', monospace",
+    fontSize: 11.5,
+    fontWeight: 500,
+    letterSpacing: '0.06em',
+    padding: '13px 24px',
+    borderRadius: 6,
+    cursor: 'pointer',
+    border: 'none',
+    textTransform: 'uppercase',
+  },
+  right: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 10,
+    alignItems: 'flex-end',
+    paddingTop: 8,
+    flexShrink: 0,
+  },
+  decoRow: {
+    display: 'flex',
+    gap: 10,
+    alignItems: 'center',
+  },
+  block: {
+    borderRadius: 6,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+  },
+  bDark: {
+    background: '#141414',
+    border: '1px solid #222',
+  },
+  bAccent: {
+    background: '#0a0f1a',
+    border: '1px solid #1a2d4a',
+  },
+  topicPill: {
+    background: '#141414',
+    border: '1px solid #222',
+    borderRadius: 4,
+    padding: '5px 10px',
+    fontFamily: "'DM Mono', monospace",
+    fontSize: 10,
+    color: '#3d3d3d',
+    letterSpacing: '0.06em',
+    whiteSpace: 'nowrap',
+  },
+  topicPillLit: {
+    color: '#60a5fa',
+    borderColor: '#1a2d4a',
+  },
+  dotGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, 8px)',
+    gap: 6,
+    opacity: 0.15,
+  },
+  dot: {
+    width: 3,
+    height: 3,
+    borderRadius: '50%',
+    background: '#f5f5f0',
+  },
+  statNum: {
+    fontFamily: "'Syne', sans-serif",
+    fontSize: 26,
+    fontWeight: 800,
+    color: '#60a5fa',
+    letterSpacing: '-0.5px',
+  },
+  statLabel: {
+    fontSize: 10,
+    color: '#333',
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+    marginTop: 2,
+    fontFamily: "'DM Mono', monospace",
+  },
+  gridBlock: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+  },
 }
+
+const DOTS = Array.from({ length: 12 })
 
 export default function LandingPage({ onToggleMode, mode }) {
   const { signInWithGoogle } = useAuth()
 
-  const heroBg = mode === 'light' ? '#292966' : '#0D0D22'
-  const heroText = '#FFFFFF'
-  const heroSubtext = 'rgba(255,255,255,0.72)'
-
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: heroBg }}>
-      <Box sx={{ position: 'fixed', top: 12, right: 12, zIndex: 10 }}>
-        <Tooltip title={mode === 'light' ? 'Dark mode' : 'Light mode'}>
-          <IconButton
+    <div style={s.page}>
+      <div style={s.inner}>
+        <div style={s.topbar}>
+          <span style={s.logo}>queryn</span>
+          <button
+            style={s.themeBtn}
             onClick={onToggleMode}
             aria-label={mode === 'light' ? 'Dark mode' : 'Light mode'}
-            sx={{ color: heroSubtext, '&:hover': { color: heroText } }}
           >
-            {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
-          </IconButton>
-        </Tooltip>
-      </Box>
+            {mode === 'light' ? '☽' : '☀'}
+          </button>
+        </div>
 
-      <Grid
-        container
-        sx={{
-          flex: 1,
-          minHeight: '100vh',
-          px: { xs: 3, sm: 6, md: 10 },
-          py: { xs: 8, md: 0 },
-          alignItems: 'center',
-          maxWidth: 1200,
-          mx: 'auto',
-          width: '100%',
-        }}
-      >
-        {/* Left column — copy */}
-        <Grid item xs={12} md={6} sx={{ pr: { md: 6 } }}>
-          <Typography
-            variant="overline"
-            sx={{ color: heroSubtext, letterSpacing: 3, display: 'block', mb: 3 }}
-          >
-            queryn
-          </Typography>
+        <div style={s.bodyWrap}>
+          <div style={s.left}>
+            <div style={s.tag}>
+              <span style={s.tagDot} />
+              AI quiz engine — CS
+            </div>
+            <div style={s.lineAccent} />
+            <h1 style={s.headline}>
+              Ace every<br />
+              CS<br />
+              <em style={s.headlineAccent}>assessment.</em>
+            </h1>
+            <p style={s.bodyText}>
+              AI-generated quizzes across 10 core CS topics. Answer, get instant explanations, and walk away knowing exactly what to review.
+            </p>
+            <button style={s.cta} onClick={signInWithGoogle}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#0d0d0d" />
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#0d0d0d" />
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#0d0d0d" />
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#0d0d0d" />
+              </svg>
+              Sign in with Google <span style={{ marginLeft: 4, fontSize: 14 }}>→</span>
+            </button>
+          </div>
 
-          <Typography
-            component="h1"
-            variant="h2"
-            sx={{
-              color: heroText,
-              fontFamily: '"Fugaz One", sans-serif',
-              fontSize: { xs: '2.6rem', sm: '3.4rem', md: '4rem' },
-              lineHeight: 1.1,
-              mb: 3,
-            }}
-          >
-            Ace every WGU CS assessment
-          </Typography>
+          <div style={s.right}>
+            <div style={s.decoRow}>
+              <span style={{ ...s.topicPill, ...s.topicPillLit }}>/ data structures</span>
+              <div style={{ ...s.block, ...s.bDark, width: 72, height: 60 }}>
+                <div style={s.dotGrid}>
+                  {DOTS.map((_, i) => <div key={i} style={s.dot} />)}
+                </div>
+              </div>
+            </div>
 
-          <Typography
-            variant="body1"
-            sx={{ color: heroSubtext, mb: 5, maxWidth: 420, lineHeight: 1.7, fontSize: '1.05rem' }}
-          >
-            AI-generated quizzes across 10 core CS topics. Answer, get instant explanations, and walk away knowing what to review.
-          </Typography>
+            <div style={s.decoRow}>
+              <div style={{ ...s.block, ...s.bDark, width: 80, height: 80 }}>
+                <div style={s.gridBlock}>
+                  <div style={s.statNum}>10</div>
+                  <div style={s.statLabel}>topics</div>
+                </div>
+              </div>
+              <div style={{ ...s.block, ...s.bAccent, width: 64, height: 64 }}>
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                  <circle cx="14" cy="14" r="10" stroke="#60a5fa" strokeWidth="1" opacity="0.5" />
+                  <circle cx="14" cy="14" r="5" stroke="#60a5fa" strokeWidth="1" opacity="0.35" />
+                  <circle cx="14" cy="14" r="2" fill="#60a5fa" opacity="0.8" />
+                </svg>
+              </div>
+              <div style={{ ...s.block, ...s.bDark, width: 56, height: 56 }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <polyline points="3,18 7,10 12,14 18,5 22,8" stroke="#60a5fa" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.7" />
+                </svg>
+              </div>
+            </div>
 
-          <Button
-            variant="contained"
-            size="large"
-            startIcon={<GoogleIcon />}
-            onClick={signInWithGoogle}
-            sx={{
-              bgcolor: heroText,
-              color: '#292966',
-              fontWeight: 700,
-              py: 1.75,
-              px: 4,
-              fontSize: '1rem',
-              '&:hover': { bgcolor: 'rgba(255,255,255,0.88)' },
-              boxShadow: 'none',
-            }}
-          >
-            Sign in with Google
-          </Button>
-        </Grid>
+            <div style={{ ...s.decoRow, gap: 8 }}>
+              <span style={s.topicPill}>algorithms</span>
+              <span style={s.topicPill}>os</span>
+              <span style={s.topicPill}>networks</span>
+            </div>
 
-        {/* Right column — decorative icon tiles */}
-        <Grid
-          item
-          md={6}
-          sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'center', alignItems: 'center' }}
-        >
-          <IconTileGrid />
-        </Grid>
-      </Grid>
-    </Box>
+            <div style={{ ...s.decoRow, gap: 8, justifyContent: 'flex-end' }}>
+              <span style={s.topicPill}>discrete math</span>
+              <span style={{ ...s.topicPill, ...s.topicPillLit }}>ai / ml</span>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
+              <span style={{ fontFamily: "'DM Mono', monospace", fontSize: 10, color: '#2a2a2a', letterSpacing: '0.08em' }}>
+                instant explanations →
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
