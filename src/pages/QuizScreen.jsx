@@ -132,7 +132,7 @@ export default function QuizScreen() {
         <Box sx={{ mt: 3 }}>
           <Card variant="outlined" sx={{ mb: 2 }}>
             <CardContent>
-              <Typography variant="body2" color="text.secondary" fontStyle="italic" data-testid="explanation">
+              <Typography variant="body2" color={isDark ? '#9a9a9a' : 'text.secondary'} fontStyle="italic" data-testid="explanation">
                 {question.explanation}
               </Typography>
             </CardContent>
