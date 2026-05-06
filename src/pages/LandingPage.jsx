@@ -174,7 +174,7 @@ export default function LandingPage({ onToggleMode, mode }) {
                 mb: { xs: '28px', md: '4vh' },
               }}
             >
-              AI-generated quizzes across 10 core CS topics. Answer, get instant explanations,
+              AI-generated quizzes across 12 core CS topics. Answer, get instant explanations,
               and walk away knowing exactly what to review.
             </Typography>
 
@@ -226,7 +226,7 @@ export default function LandingPage({ onToggleMode, mode }) {
               <Block sx={{ width: 110, height: 110 }}>
                 <Stack alignItems="center" justifyContent="center" gap="2px">
                   <Typography sx={{ fontFamily: display, fontSize: 26, fontWeight: 800, color: accent, letterSpacing: '-0.5px' }}>
-                    10
+                    12
                   </Typography>
                   <Typography sx={{ fontFamily: mono, fontSize: 10, color: '#333', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                     topics

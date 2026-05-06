@@ -19,6 +19,8 @@ const TOPICS = [
   'Derivatives',
   'Integrals',
   'Differential Equations',
+  'Java Development',
+  'AI / Machine Learning',
 ]
 
 function renderWithRouter() {
@@ -35,7 +37,7 @@ function renderWithRouter() {
 }
 
 describe('TopicSelector', () => {
-  it('renders all 10 topic cards', () => {
+  it('renders all 12 topic cards', () => {
     renderWithRouter()
     TOPICS.forEach(topic => {
       expect(screen.getByText(topic)).toBeInTheDocument()
@@ -51,6 +53,13 @@ describe('TopicSelector', () => {
     const user = userEvent.setup()
     renderWithRouter()
     await user.click(screen.getByText('Derivatives'))
+    expect(screen.getByTestId('quiz-screen')).toBeInTheDocument()
+  })
+
+  it('navigates when the AI / Machine Learning card is clicked', async () => {
+    const user = userEvent.setup()
+    renderWithRouter()
+    await user.click(screen.getByText('AI / Machine Learning'))
     expect(screen.getByTestId('quiz-screen')).toBeInTheDocument()
   })
 })
