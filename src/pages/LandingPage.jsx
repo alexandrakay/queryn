@@ -6,24 +6,21 @@ const s = {
     background: '#0d0d0d',
     minHeight: '100vh',
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '40px 20px',
+    flexDirection: 'column',
     fontFamily: "'DM Mono', monospace",
   },
   inner: {
     background: '#0d0d0d',
-    width: '100%',
-    maxWidth: 900,
-    padding: '36px 44px 48px',
-    position: 'relative',
-    overflow: 'hidden',
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '4vh 7vw 6vh',
   },
   topbar: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 52,
+    marginBottom: '6vh',
   },
   logo: {
     fontFamily: "'DM Mono', monospace",
@@ -48,12 +45,12 @@ const s = {
   bodyWrap: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: 32,
+    alignItems: 'center',
+    gap: '4vw',
+    flex: 1,
   },
   left: {
     flex: 1,
-    maxWidth: 520,
   },
   tag: {
     display: 'inline-flex',
@@ -82,12 +79,12 @@ const s = {
   },
   headline: {
     fontFamily: "'Syne', sans-serif",
-    fontSize: 58,
+    fontSize: 'clamp(52px, 6.5vw, 96px)',
     fontWeight: 800,
     lineHeight: 1.0,
     color: '#f5f5f0',
-    letterSpacing: '-2px',
-    marginBottom: 22,
+    letterSpacing: '-3px',
+    marginBottom: '2.5vh',
   },
   headlineAccent: {
     color: '#60a5fa',
@@ -95,11 +92,11 @@ const s = {
   },
   bodyText: {
     fontFamily: "'DM Mono', monospace",
-    fontSize: 12.5,
+    fontSize: 'clamp(12px, 1vw, 15px)',
     lineHeight: 1.8,
     color: '#5a5a5a',
-    maxWidth: 400,
-    marginBottom: 36,
+    maxWidth: '38vw',
+    marginBottom: '4vh',
   },
   cta: {
     display: 'inline-flex',
@@ -120,14 +117,15 @@ const s = {
   right: {
     display: 'flex',
     flexDirection: 'column',
-    gap: 10,
+    gap: 14,
     alignItems: 'flex-end',
-    paddingTop: 8,
     flexShrink: 0,
+    width: '38vw',
+    maxWidth: 500,
   },
   decoRow: {
     display: 'flex',
-    gap: 10,
+    gap: 14,
     alignItems: 'center',
   },
   block: {
@@ -244,7 +242,7 @@ export default function LandingPage({ onToggleMode, mode }) {
           <div style={s.right}>
             <div style={s.decoRow}>
               <span style={{ ...s.topicPill, ...s.topicPillLit }}>/ data structures</span>
-              <div style={{ ...s.block, ...s.bDark, width: 72, height: 60 }}>
+              <div style={{ ...s.block, ...s.bDark, width: '9vw', maxWidth: 120, height: '7vw', maxHeight: 96 }}>
                 <div style={s.dotGrid}>
                   {DOTS.map((_, i) => <div key={i} style={s.dot} />)}
                 </div>
@@ -252,33 +250,33 @@ export default function LandingPage({ onToggleMode, mode }) {
             </div>
 
             <div style={s.decoRow}>
-              <div style={{ ...s.block, ...s.bDark, width: 80, height: 80 }}>
+              <div style={{ ...s.block, ...s.bDark, width: '10vw', maxWidth: 130, height: '10vw', maxHeight: 130 }}>
                 <div style={s.gridBlock}>
                   <div style={s.statNum}>10</div>
                   <div style={s.statLabel}>topics</div>
                 </div>
               </div>
-              <div style={{ ...s.block, ...s.bAccent, width: 64, height: 64 }}>
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <div style={{ ...s.block, ...s.bAccent, width: '8vw', maxWidth: 104, height: '8vw', maxHeight: 104 }}>
+                <svg width="40" height="40" viewBox="0 0 28 28" fill="none">
                   <circle cx="14" cy="14" r="10" stroke="#60a5fa" strokeWidth="1" opacity="0.5" />
                   <circle cx="14" cy="14" r="5" stroke="#60a5fa" strokeWidth="1" opacity="0.35" />
                   <circle cx="14" cy="14" r="2" fill="#60a5fa" opacity="0.8" />
                 </svg>
               </div>
-              <div style={{ ...s.block, ...s.bDark, width: 56, height: 56 }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <div style={{ ...s.block, ...s.bDark, width: '7vw', maxWidth: 90, height: '7vw', maxHeight: 90 }}>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
                   <polyline points="3,18 7,10 12,14 18,5 22,8" stroke="#60a5fa" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.7" />
                 </svg>
               </div>
             </div>
 
-            <div style={{ ...s.decoRow, gap: 8 }}>
+            <div style={{ ...s.decoRow, gap: 10 }}>
               <span style={s.topicPill}>algorithms</span>
               <span style={s.topicPill}>os</span>
               <span style={s.topicPill}>networks</span>
             </div>
 
-            <div style={{ ...s.decoRow, gap: 8, justifyContent: 'flex-end' }}>
+            <div style={{ ...s.decoRow, gap: 10, justifyContent: 'flex-end' }}>
               <span style={s.topicPill}>discrete math</span>
               <span style={{ ...s.topicPill, ...s.topicPillLit }}>ai / ml</span>
             </div>
