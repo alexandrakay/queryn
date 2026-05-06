@@ -5,8 +5,8 @@ import { generateQuestions } from '../services/anthropic'
 
 function optionSx(i, selectedIndex, correctIndex) {
   if (selectedIndex === null) return {}
-  if (i === correctIndex) return { borderColor: '#4A7C59', color: '#4A7C59', bgcolor: '#4A7C5912' }
-  if (i === selectedIndex) return { borderColor: '#9B3A3A', color: '#9B3A3A', bgcolor: '#9B3A3A12' }
+  if (i === correctIndex) return { borderColor: '#22c55e', color: '#22c55e', bgcolor: 'rgba(34,197,94,0.06)' }
+  if (i === selectedIndex) return { borderColor: '#ef4444', color: '#ef4444', bgcolor: 'rgba(239,68,68,0.06)' }
   return {}
 }
 
