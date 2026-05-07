@@ -1,6 +1,6 @@
 # queryn
 
-AI-powered CS quiz prep for WGU students.
+AI-powered CS quiz prep for CS students.
 
 **Live app → [queryn-dfe1d.web.app](https://queryn-dfe1d.web.app)**
 
