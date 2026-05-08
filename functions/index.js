@@ -37,6 +37,8 @@ function makeAnthropicClient(apiKey) {
   return new AnthropicClass({ apiKey })
 }
 
+const { parseTopic } = require('./topicValidation')
+
 exports.generateQuestions = onRequest({ secrets: [anthropicKey] }, async (req, res) => {
   setCors(req, res)
 
@@ -52,10 +54,12 @@ exports.generateQuestions = onRequest({ secrets: [anthropicKey] }, async (req, r
   }
 
   const { topic } = req.body ?? {}
-  if (!topic || typeof topic !== 'string') {
-    res.status(400).json({ error: 'topic is required.' })
+  const topicResult = parseTopic(topic)
+  if (!topicResult.ok) {
+    res.status(400).json({ error: topicResult.error })
     return
   }
+  const normalizedTopic = topicResult.topic
 
   try {
     const client = makeAnthropicClient(anthropicKey.value())
@@ -65,7 +69,7 @@ exports.generateQuestions = onRequest({ secrets: [anthropicKey] }, async (req, r
       messages: [
         {
           role: 'user',
-          content: `Generate exactly 5 multiple choice questions about "${topic}" for a CS student.
+          content: `Generate exactly 5 multiple choice questions about "${normalizedTopic}" for a CS student.
 
 Return ONLY a valid JSON array with no extra text. Each object must have:
 - "question": string
@@ -109,10 +113,17 @@ exports.generateSessionSummary = onRequest({ secrets: [anthropicKey] }, async (r
   }
 
   const { topic, results } = req.body ?? {}
-  if (!topic || !Array.isArray(results)) {
+  if (!Array.isArray(results)) {
     res.status(400).json({ error: 'topic and results are required.' })
     return
   }
+
+  const topicResult = parseTopic(topic)
+  if (!topicResult.ok) {
+    res.status(400).json({ error: topicResult.error })
+    return
+  }
+  const normalizedTopic = topicResult.topic
 
   try {
     const client = makeAnthropicClient(anthropicKey.value())
@@ -126,7 +137,7 @@ exports.generateSessionSummary = onRequest({ secrets: [anthropicKey] }, async (r
       messages: [
         {
           role: 'user',
-          content: `A CS student just completed a quiz on "${topic}". Here are their results:\n\n${resultLines}\n\nWrite a 2-3 sentence personalized summary of their performance. Note what they did well and what to review. Return plain text only, no JSON.`,
+          content: `A CS student just completed a quiz on "${normalizedTopic}". Here are their results:\n\n${resultLines}\n\nWrite a 2-3 sentence personalized summary of their performance. Note what they did well and what to review. Return plain text only, no JSON.`,
         },
       ],
     })

@@ -1,7 +1,22 @@
 import { getAuth } from 'firebase/auth'
 import { app } from '../firebase'
+import { MAX_TOPIC_LENGTH } from '../constants/topic'
 
 const FUNCTIONS_BASE = 'https://us-central1-queryn-dfe1d.cloudfunctions.net'
+
+function normalizeTopicOrThrow(topic) {
+  if (topic == null || typeof topic !== 'string') {
+    throw new Error('topic is required.')
+  }
+  const t = topic.trim()
+  if (!t) {
+    throw new Error('topic is required.')
+  }
+  if (t.length > MAX_TOPIC_LENGTH) {
+    throw new Error('topic must be 250 characters or fewer.')
+  }
+  return t
+}
 
 async function callFn(name, body) {
   const user = getAuth(app).currentUser
@@ -22,7 +37,8 @@ async function callFn(name, body) {
 }
 
 export async function generateQuestions(topic) {
-  const { questions } = await callFn('generateQuestions', { topic })
+  const t = normalizeTopicOrThrow(topic)
+  const { questions } = await callFn('generateQuestions', { topic: t })
 
   if (!Array.isArray(questions) || questions.length !== 5) {
     throw new Error('Invalid question format from API')
@@ -32,6 +48,10 @@ export async function generateQuestions(topic) {
 }
 
 export async function generateSessionSummary(topic, results) {
-  const { summary } = await callFn('generateSessionSummary', { topic, results })
+  if (!Array.isArray(results)) {
+    throw new Error('topic and results are required.')
+  }
+  const t = normalizeTopicOrThrow(topic)
+  const { summary } = await callFn('generateSessionSummary', { topic: t, results })
   return summary
 }
