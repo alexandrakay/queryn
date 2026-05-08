@@ -38,6 +38,10 @@ function makeAnthropicClient(apiKey) {
 }
 
 const { parseTopic } = require('./topicValidation')
+const { checkRateLimit } = require('./rateLimit')
+
+/** Helps clients retry after throttling — see functions/rateLimit.js for window & counts. */
+const RATE_LIMIT_STATUS = 429
 
 exports.generateQuestions = onRequest({ secrets: [anthropicKey] }, async (req, res) => {
   setCors(req, res)
@@ -62,6 +66,12 @@ exports.generateQuestions = onRequest({ secrets: [anthropicKey] }, async (req, r
   const normalizedTopic = topicResult.topic
 
   try {
+    const rl = await checkRateLimit(admin, auth.uid, 'generateQuestions')
+    if (!rl.ok) {
+      res.status(RATE_LIMIT_STATUS).json({ error: rl.error })
+      return
+    }
+
     const client = makeAnthropicClient(anthropicKey.value())
     const response = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
@@ -126,6 +136,12 @@ exports.generateSessionSummary = onRequest({ secrets: [anthropicKey] }, async (r
   const normalizedTopic = topicResult.topic
 
   try {
+    const rl = await checkRateLimit(admin, auth.uid, 'generateSessionSummary')
+    if (!rl.ok) {
+      res.status(RATE_LIMIT_STATUS).json({ error: rl.error })
+      return
+    }
+
     const client = makeAnthropicClient(anthropicKey.value())
     const resultLines = results
       .map(r => `Q: ${r.question} | Correct: ${r.correctIndex} | Selected: ${r.selectedIndex}`)

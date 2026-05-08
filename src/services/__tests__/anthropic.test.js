@@ -73,6 +73,16 @@ describe('generateQuestions', () => {
     await expect(generateQuestions('Networks')).rejects.toThrow()
   })
 
+  it('surfaces Cloud Function rate limit (429) error text', async () => {
+    const msg = 'Too many requests. Please wait a few minutes and try again.'
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 429,
+      text: () => Promise.resolve(JSON.stringify({ error: msg })),
+    })
+    await expect(generateQuestions('Networks')).rejects.toThrow(msg)
+  })
+
   it('throws on non-ok response', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
