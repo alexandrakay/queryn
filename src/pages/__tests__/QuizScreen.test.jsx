@@ -70,6 +70,21 @@ describe('QuizScreen — layout', () => {
     renderAtRoute()
     await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument())
   })
+
+  it('surfaces the API error message in the quiz error banner', async () => {
+    generateQuestions.mockRejectedValue(new Error('topic must be 250 characters or fewer.'))
+    renderAtRoute()
+    await waitFor(() => expect(screen.getByText(/250 characters or fewer/i)).toBeInTheDocument())
+  })
+
+  it('retries generating questions when Try again is clicked', async () => {
+    const user = userEvent.setup()
+    generateQuestions.mockRejectedValueOnce(new Error('Temporary failure')).mockResolvedValueOnce(MOCK_QUESTIONS)
+    renderAtRoute()
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument())
+    await user.click(screen.getByTestId('quiz-retry-generation'))
+    await waitFor(() => expect(screen.getByTestId('question-text')).toBeInTheDocument())
+  })
 })
 
 describe('QuizScreen — answer selection', () => {

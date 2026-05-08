@@ -46,13 +46,22 @@ export default function QuizScreen() {
   const [selectedIndex, setSelectedIndex] = useState(null)
   const [score, setScore] = useState(0)
   const [results, setResults] = useState([])
+  const [retryNonce, setRetryNonce] = useState(0)
 
   useEffect(() => {
+    setLoading(true)
+    setError(null)
     generateQuestions(topic)
       .then(setQuestions)
-      .catch(() => setError('Failed to generate questions. Please try again.'))
+      .catch(err => {
+        const msg =
+          err instanceof Error && err.message?.trim()
+            ? err.message.trim()
+            : 'Failed to generate questions. Please try again.'
+        setError(msg)
+      })
       .finally(() => setLoading(false))
-  }, [topic])
+  }, [topic, retryNonce])
 
   if (loading) {
     return (
@@ -67,7 +76,12 @@ export default function QuizScreen() {
     return (
       <Box sx={{ p: 4, maxWidth: 600, mx: 'auto' }}>
         <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>
-        <Button variant="outlined" onClick={() => navigate('/')}>Back to Topics</Button>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+          <Button variant="outlined" onClick={() => navigate('/')}>Back to Topics</Button>
+          <Button variant="contained" data-testid="quiz-retry-generation" onClick={() => setRetryNonce(n => n + 1)}>
+            Try again
+          </Button>
+        </Stack>
       </Box>
     )
   }
