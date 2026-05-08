@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Box, Card, CardContent, Typography, Button, Divider, CircularProgress, Chip } from '@mui/material'
+import { useState, useEffect, useCallback } from 'react'
+import { Box, Card, CardContent, Typography, Button, Divider, CircularProgress, Chip, Alert } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { generateSessionSummary } from '../services/anthropic'
@@ -19,30 +19,46 @@ export default function ScoreScreen() {
   const { user } = useAuth()
   const { score = 0, total = 5, topic = '', results = [] } = state ?? {}
   const [aiFeedback, setAiFeedback] = useState(null)
+  const [summaryError, setSummaryError] = useState(null)
   const [summaryLoading, setSummaryLoading] = useState(true)
   const { label, color } = scoreLabel(score, total)
 
-  useEffect(() => {
+  const loadSummary = useCallback(async () => {
     if (!results.length) {
       setSummaryLoading(false)
+      setSummaryError(null)
+      setAiFeedback(null)
       return
     }
-    generateSessionSummary(topic, results)
-      .then(summary => {
-        setAiFeedback(summary)
-        if (user) {
-          saveSession(user.uid, {
-            topic,
-            score,
-            totalQuestions: total,
-            aiFeedback: summary,
-            questions: results,
-          }).catch(() => {})
-        }
-      })
-      .catch(() => setAiFeedback('Unable to generate summary. Please try again.'))
-      .finally(() => setSummaryLoading(false))
-  }, [])
+    setSummaryLoading(true)
+    setSummaryError(null)
+    setAiFeedback(null)
+    try {
+      const summary = await generateSessionSummary(topic, results)
+      setAiFeedback(summary)
+      if (user) {
+        saveSession(user.uid, {
+          topic,
+          score,
+          totalQuestions: total,
+          aiFeedback: summary,
+          questions: results,
+        }).catch(() => {})
+      }
+    } catch (err) {
+      const msg =
+        err instanceof Error && err.message?.trim()
+          ? err.message.trim()
+          : 'Unable to generate summary. Please try again.'
+      setSummaryError(msg)
+    } finally {
+      setSummaryLoading(false)
+    }
+  }, [topic, results, user, score, total])
+
+  useEffect(() => {
+    loadSummary()
+  }, [loadSummary])
 
   return (
     <Box sx={{ p: { xs: 3, sm: 4 }, maxWidth: 600, mx: 'auto', textAlign: 'center', mt: { xs: 4, sm: 6 } }}>
@@ -71,6 +87,13 @@ export default function ScoreScreen() {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 1 }}>
               <CircularProgress size={16} />
               <Typography variant="body2" color="text.secondary">Generating your summary…</Typography>
+            </Box>
+          ) : summaryError ? (
+            <Box sx={{ mt: 1 }}>
+              <Alert severity="error" sx={{ mb: 2 }}>{summaryError}</Alert>
+              <Button variant="outlined" size="small" data-testid="summary-retry" onClick={() => loadSummary()}>
+                Retry summary
+              </Button>
             </Box>
           ) : (
             <Typography

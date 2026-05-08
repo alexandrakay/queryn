@@ -25,7 +25,8 @@ describe('generateQuestions', () => {
   beforeEach(() => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ questions: MOCK_QUESTIONS }),
+      status: 200,
+      text: () => Promise.resolve(JSON.stringify({ questions: MOCK_QUESTIONS })),
     })
   })
 
@@ -66,7 +67,8 @@ describe('generateQuestions', () => {
   it('throws if the response data is not a valid array of 5', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ questions: [{ question: 'only one' }] }),
+      status: 200,
+      text: () => Promise.resolve(JSON.stringify({ questions: [{ question: 'only one' }] })),
     })
     await expect(generateQuestions('Networks')).rejects.toThrow()
   })
@@ -74,9 +76,28 @@ describe('generateQuestions', () => {
   it('throws on non-ok response', async () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
-      json: () => Promise.resolve({ error: 'Must be signed in.' }),
+      status: 401,
+      text: () => Promise.resolve(JSON.stringify({ error: 'Must be signed in.' })),
     })
     await expect(generateQuestions('Networks')).rejects.toThrow('Must be signed in.')
+  })
+
+  it('throws a sensible message when error response is not JSON', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 502,
+      text: () => Promise.resolve('<html>bad gateway</html>'),
+    })
+    await expect(generateQuestions('Networks')).rejects.toThrow('Request failed (502).')
+  })
+
+  it('throws when OK response body is not JSON', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: () => Promise.resolve('not-json'),
+    })
+    await expect(generateQuestions('Networks')).rejects.toThrow('Invalid response from server.')
   })
 })
 
@@ -84,7 +105,11 @@ describe('generateSessionSummary', () => {
   beforeEach(() => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ summary: 'You did well on recursion but should review sorting algorithms.' }),
+      status: 200,
+      text: () =>
+        Promise.resolve(
+          JSON.stringify({ summary: 'You did well on recursion but should review sorting algorithms.' })
+        ),
     })
   })
 
@@ -110,5 +135,14 @@ describe('generateSessionSummary', () => {
   it('throws when results is not an array', async () => {
     await expect(generateSessionSummary('Algorithms', null)).rejects.toThrow('topic and results are required.')
     expect(global.fetch).not.toHaveBeenCalled()
+  })
+
+  it('throws server error message on non-ok response', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 400,
+      text: () => Promise.resolve(JSON.stringify({ error: 'topic is required.' })),
+    })
+    await expect(generateSessionSummary('Algorithms', MOCK_RESULTS)).rejects.toThrow('topic is required.')
   })
 })

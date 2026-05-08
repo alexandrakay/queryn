@@ -31,9 +31,25 @@ async function callFn(name, body) {
     body: JSON.stringify(body),
   })
 
-  const json = await res.json()
-  if (!res.ok) throw new Error(json.error ?? 'Function call failed')
-  return json
+  const status = res.status ?? 500
+  const raw = typeof res.text === 'function' ? await res.text() : ''
+
+  let data = {}
+  try {
+    data = raw ? JSON.parse(raw) : {}
+  } catch {
+    if (!res.ok) {
+      throw new Error(`Request failed (${status}).`)
+    }
+    throw new Error('Invalid response from server.')
+  }
+
+  if (!res.ok) {
+    const msg = typeof data.error === 'string' ? data.error : `Request failed (${status}).`
+    throw new Error(msg)
+  }
+
+  return data
 }
 
 export async function generateQuestions(topic) {
