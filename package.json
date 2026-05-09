@@ -8,7 +8,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "dev:e2e": "vite --mode e2e --host 127.0.0.1 --port 5173",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "playwright:install": "PLAYWRIGHT_BROWSERS_PATH=0 playwright install chromium"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.93.0",
@@ -25,6 +29,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@playwright/test": "^1.57.0",
     "@vitejs/plugin-react": "^4.3.0",
     "@vitest/ui": "^4.1.5",
     "jsdom": "^29.1.1",

@@ -1,6 +1,7 @@
 import { getAuth } from 'firebase/auth'
 import { app } from '../firebase'
 import { MAX_TOPIC_LENGTH } from '../constants/topic'
+import { isE2eMode } from '../e2eFlags'
 
 const FUNCTIONS_BASE = 'https://us-central1-queryn-dfe1d.cloudfunctions.net'
 
@@ -20,7 +21,11 @@ function normalizeTopicOrThrow(topic) {
 
 async function callFn(name, body) {
   const user = getAuth(app).currentUser
-  const token = user ? await user.getIdToken() : null
+  const token = isE2eMode()
+    ? 'e2e-playwright-token'
+    : user
+      ? await user.getIdToken()
+      : null
 
   const res = await fetch(`${FUNCTIONS_BASE}/${name}`, {
     method: 'POST',
