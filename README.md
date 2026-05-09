@@ -205,3 +205,7 @@ npm run test
 ```
 
 **Vitest** runs React component and service specs plus Node-side tests colocated under `functions/` (topic validation, rate limits, AI request logging, etc.). **Playwright** runs a single smoke path against the dev server in E2E mode; see [End-to-end (Playwright)](#end-to-end-playwright).
+
+### Manual: reduced motion
+
+Turn on **Reduce motion** in your OS (for example macOS **System Settings → Accessibility → Display → Reduce motion**), reload the app, and open the signed-in topic grid. Topic cards should **not** animate a hover lift or shadow transition; keyboard **Tab** focus should still show a clear outline on buttons and cards.

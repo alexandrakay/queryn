@@ -53,6 +53,12 @@ export default function TopicSelector() {
                   transform: 'translateY(-2px)',
                 },
                 transition: 'box-shadow 0.2s ease, transform 0.15s ease',
+                '@media (prefers-reduced-motion: reduce)': {
+                  transition: 'none',
+                  '&:hover': {
+                    transform: 'none',
+                  },
+                },
               }}
               onClick={() => navigate(`/quiz/${encodeURIComponent(label)}`)}
             >
