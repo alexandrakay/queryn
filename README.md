@@ -8,11 +8,13 @@ AI-powered CS quiz prep for CS students.
 
 ## What it does
 
-queryn generates on-demand multiple choice quizzes across 12 core Computer Science topics using Claude Haiku. Answer a question, get an instant AI explanation, finish the session, and receive a personalized performance summary — all saved to your history.
+queryn generates on-demand multiple choice quizzes across **twelve** study topics (core CS plus related math) using Claude Haiku. Answer a question, get an instant AI explanation, finish the session, and receive a personalized performance summary — all saved to your history.
 
 ---
 
 ## Topics
+
+The topic grid in the app matches this set (12 cards):
 
 | # | Topic |
 |---|-------|
@@ -37,6 +39,7 @@ queryn generates on-demand multiple choice quizzes across 12 core Computer Scien
 |-------|-----------|
 | Frontend | React 18 + Vite |
 | UI | MUI v5 |
+| Routing | React Router |
 | Auth | Firebase Authentication (Google Sign-In) |
 | Database | Cloud Firestore |
 | Hosting | Firebase Hosting |
@@ -52,48 +55,31 @@ queryn generates on-demand multiple choice quizzes across 12 core Computer Scien
 Sign in → Pick topic → 5 AI questions → Answer + explanation → Score + AI summary → Saved to history
 ```
 
-1. User signs in with Google
-2. Selects one of 12 topic cards
-3. Cloud Function calls Claude Haiku → returns 5 MCQs as JSON
-4. User answers one question at a time with immediate correct/incorrect feedback
-5. Each answer reveals an AI-generated explanation
-6. After question 5, a second Claude call generates a personalized session summary
-7. Score screen displays result + summary
-8. Session written to Firestore for history review
+1. User signs in with Google (landing experience until Firebase reports a user).
+2. Chooses one of **12** topic cards on the home grid; each card navigates to `/quiz/<topic>`.
+3. A Cloud Function calls Claude Haiku and returns **five** multiple-choice questions as JSON.
+4. User answers one question at a time with immediate correct/incorrect styling on the options.
+5. After selecting an answer, an AI-written explanation appears before moving on.
+6. After the fifth question, another Cloud Function call produces a short personalized summary.
+7. The score screen shows the result, summary, and navigation back to topics or history.
+8. A completed session is written under `users/{uid}/sessions` for history review.
+
+While signed in, the top **Nav** bar (home, history, theme toggle, sign out) is shown on topic, score, and history routes; it is **hidden on quiz** so the question view stays focused.
+
+Server-side **rate limits** apply per user to the AI HTTPS endpoints; throttled clients receive HTTP 429 with a clear error message.
 
 ---
 
-## Project structure
+## Project layout
 
-```
-queryn/
-├── src/
-│   ├── e2eFlags.js              # `VITE_E2E` gate + stub user id (Playwright)
-│   ├── App.jsx                  # Root — routing, theme toggle, auth guard
-│   ├── theme.js                 # MUI theme (dark editorial palette)
-│   ├── components/
-│   │   └── Nav.jsx              # Authenticated nav bar with sign-out
-│   ├── context/
-│   │   └── AuthContext.jsx      # Firebase auth state + signIn/signOut
-│   ├── pages/
-│   │   ├── LandingPage.jsx      # Pre-auth hero page
-│   │   ├── TopicSelector.jsx    # 10-card topic grid
-│   │   ├── QuizScreen.jsx       # Question + answer + explanation
-│   │   ├── ScoreScreen.jsx      # Final score + AI summary
-│   │   └── HistoryScreen.jsx    # Past sessions accordion
-│   └── services/
-│       ├── anthropic.js         # Cloud Function calls (generateQuestions, generateSessionSummary)
-│       └── firestore.js         # saveSession, getSessions
-├── functions/
-│   ├── index.js                 # Cloud Functions — proxies Anthropic API calls server-side
-│   └── aiRequestLog.js          # Structured Cloud Logging for AI HTTPS handlers
-├── e2e/
-│   └── smoke.spec.js            # Playwright — topic grid → quiz (mocked Cloud Functions)
-├── playwright.config.js         # E2E runner + `npm run dev:e2e` webServer
-├── .env.e2e                     # Dummy `VITE_*` + `VITE_E2E=1` for Playwright only (committed)
-├── firebase.json                # Hosting + Functions config
-└── firestore.rules              # Auth-gated read/write rules
-```
+High-level map (prefer this over a long per-file tree that drifts):
+
+| Area | Responsibility |
+|------|------------------|
+| **`src/`** | React SPA: auth-aware routing, MUI theming, landing hero, 12-topic grid, quiz → score flow, session history, Firebase clients for auth/Firestore, and fetch calls to the hosted AI HTTPS functions. |
+| **`functions/`** | Cloud Functions: shared topic validation, per-user rate limits, Anthropic proxying with secrets, structured Cloud Logging for each AI request outcome. |
+| **`e2e/`** | Playwright smoke: real browser, **stubbed** Cloud Function responses and **E2E mode** (`vite --mode e2e` + committed `.env.e2e` placeholders only). |
+| **Root** | `firebase.json`, `firestore.rules`, `playwright.config.js`, Vite config. |
 
 ---
 
@@ -180,10 +166,9 @@ npm run test:watch  # watch mode
 
 ### End-to-end (Playwright)
 
-Smoke tests use **`vite --mode e2e`**, which loads **`.env.e2e`** (`VITE_E2E=1` plus placeholder Firebase keys). In that mode the app skips Google sign-in and treats you as signed in with a fixed stub user (`src/e2eFlags.js`, `src/context/AuthContext.jsx`). Cloud Function traffic is **not** required: specs stub `generateQuestions` / `generateSessionSummary` with `page.route` so CI never calls Anthropic.
+Smoke tests use **`vite --mode e2e`**, which loads **`.env.e2e`** (`VITE_E2E=1` plus placeholder Firebase keys). In that mode the app skips Google sign-in and treats you as signed in with a fixed stub user. Cloud Function traffic is **not** required: specs stub `generateQuestions` / `generateSessionSummary` with `page.route` so CI never calls Anthropic.
 
 ```bash
-npm install
 npm run playwright:install        # Chromium into node_modules (matches playwright.config.js)
 npm run test:e2e                  # starts dev:e2e if needed, runs e2e/smoke.spec.js
 npm run test:e2e:ui               # optional Playwright UI mode
@@ -206,10 +191,10 @@ firebase deploy                   # everything
 
 ## Design
 
-- **Fonts**: Syne (display headings) + DM Mono (body, UI, labels)
+- **Fonts**: Syne (MUI heading scale) + DM Mono (body and UI). Topic card titles on the grid also use **Fugaz One** for display contrast.
 - **Dark mode**: `#0d0d0d` background · `#141414` surfaces · `#60a5fa` accent · `#f5f5f0` text
 - **Light mode**: `#f5f5f0` background · `#ffffff` surfaces · same accent and fonts
-- Toggle between modes with the moon/sun button on any screen
+- Toggle between modes with the moon/sun button in **Nav** (when visible).
 
 ---
 
@@ -219,4 +204,4 @@ firebase deploy                   # everything
 npm run test
 ```
 
-Vitest runs frontend and `functions/` unit tests (topic validation, rate limits, AI request logging, etc.).
+**Vitest** runs React component and service specs plus Node-side tests colocated under `functions/` (topic validation, rate limits, AI request logging, etc.). **Playwright** runs a single smoke path against the dev server in E2E mode; see [End-to-end (Playwright)](#end-to-end-playwright).
