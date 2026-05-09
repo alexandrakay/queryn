@@ -84,7 +84,8 @@ queryn/
 │       ├── anthropic.js         # Cloud Function calls (generateQuestions, generateSessionSummary)
 │       └── firestore.js         # saveSession, getSessions
 ├── functions/
-│   └── index.js                 # Cloud Functions — proxies Anthropic API calls server-side
+│   ├── index.js                 # Cloud Functions — proxies Anthropic API calls server-side
+│   └── aiRequestLog.js          # Structured Cloud Logging for AI HTTPS handlers
 ├── firebase.json                # Hosting + Functions config
 └── firestore.rules              # Auth-gated read/write rules
 ```
@@ -114,6 +115,25 @@ users/{uid}/sessions/{sessionId}
 ```
 
 Security rules: authenticated users can read/write only their own `users/{uid}/` path.
+
+---
+
+## Cloud Logging (AI HTTPS functions)
+
+Structured logs fire once per **`generateQuestions`** and **`generateSessionSummary`** invocation (except `OPTIONS`). Search in **Logs Explorer** (Google Cloud Console) using JSON fields prefixed with `queryn_`:
+
+| Field | Use |
+|-------|-----|
+| `jsonPayload.message="queryn_ai_request"` | Row type (same text as Firebase’s first log argument) |
+| `jsonPayload.queryn_endpoint="generateQuestions"` | Filter one function |
+| `jsonPayload.queryn_outcome="success"` | Outcomes include `success`, `auth_denied`, `validation_failed`, `rate_limited`, `upstream_malformed`, `internal_error` |
+| `jsonPayload.queryn_httpStatus` | Match alerting to client-facing status codes |
+| `jsonPayload.queryn_uid` | Your Firebase UID (debug your own traffic) |
+| `jsonPayload.queryn_durationMs` | Wall time for the handler |
+| `jsonPayload.queryn_topicLength`, `jsonPayload.queryn_topicCorrelation` | Topic size and SHA-256 short fingerprint — **never** raw topic text |
+| `jsonPayload.queryn_resultsCount` | Question count returned or quiz result rows (when applicable) |
+
+Example filter: `jsonPayload.queryn_endpoint="generateQuestions" AND jsonPayload.queryn_outcome="rate_limited"`.
 
 ---
 
@@ -149,7 +169,7 @@ VITE_FIREBASE_APP_ID=your_app_id
 
 ```bash
 npm run dev         # start dev server at localhost:5173
-npm run test        # run test suite (53 tests)
+npm run test        # run test suite (Vitest)
 npm run test:watch  # watch mode
 ```
 
@@ -179,4 +199,4 @@ firebase deploy                   # everything
 npm run test
 ```
 
-53 tests across 10 files covering: LandingPage, TopicSelector, QuizScreen, ScoreScreen, HistoryScreen, Nav, Anthropic service, Firestore service, and theme.
+Vitest runs frontend and `functions/` unit tests (topic validation, rate limits, AI request logging, etc.).

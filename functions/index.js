@@ -39,6 +39,7 @@ function makeAnthropicClient(apiKey) {
 
 const { parseTopic } = require('./topicValidation')
 const { checkRateLimit } = require('./rateLimit')
+const { createAiTracer } = require('./aiRequestLog')
 
 /** Helps clients retry after throttling — see functions/rateLimit.js for window & counts. */
 const RATE_LIMIT_STATUS = 429
@@ -51,23 +52,40 @@ exports.generateQuestions = onRequest({ secrets: [anthropicKey] }, async (req, r
     return
   }
 
+  const trace = createAiTracer('generateQuestions')
+
   const auth = await verifyToken(req)
   if (!auth) {
+    trace.finish({ outcome: 'auth_denied', httpStatus: 401 })
     res.status(401).json({ error: 'Must be signed in.' })
     return
   }
+  trace.bindAuth(auth)
 
   const { topic } = req.body ?? {}
   const topicResult = parseTopic(topic)
   if (!topicResult.ok) {
+    trace.noteRawTopicLength(topic)
+    trace.finish({
+      outcome: 'validation_failed',
+      httpStatus: 400,
+      errorClass: 'topic_validation',
+    })
     res.status(400).json({ error: topicResult.error })
     return
   }
+
   const normalizedTopic = topicResult.topic
+  trace.noteValidatedTopic(normalizedTopic)
 
   try {
     const rl = await checkRateLimit(admin, auth.uid, 'generateQuestions')
     if (!rl.ok) {
+      trace.finish({
+        outcome: 'rate_limited',
+        httpStatus: RATE_LIMIT_STATUS,
+        errorClass: 'rate_limit',
+      })
       res.status(RATE_LIMIT_STATUS).json({ error: rl.error })
       return
     }
@@ -98,12 +116,24 @@ Example format:
     const parsed = JSON.parse(text)
 
     if (!Array.isArray(parsed) || parsed.length !== 5) {
+      trace.finish({
+        outcome: 'upstream_malformed',
+        httpStatus: 500,
+        errorClass: 'invalid_question_shape',
+      })
       res.status(500).json({ error: 'Invalid question format from API.' })
       return
     }
 
+    trace.finish({ outcome: 'success', httpStatus: 200, resultsCount: parsed.length })
     res.json({ questions: parsed })
   } catch (e) {
+    const errorClass = e instanceof SyntaxError ? 'json_parse' : 'exception'
+    trace.finish({
+      outcome: 'internal_error',
+      httpStatus: 500,
+      errorClass,
+    })
     res.status(500).json({ error: e.message })
   }
 })
@@ -116,28 +146,53 @@ exports.generateSessionSummary = onRequest({ secrets: [anthropicKey] }, async (r
     return
   }
 
+  const trace = createAiTracer('generateSessionSummary')
+
   const auth = await verifyToken(req)
   if (!auth) {
+    trace.finish({ outcome: 'auth_denied', httpStatus: 401 })
     res.status(401).json({ error: 'Must be signed in.' })
     return
   }
+  trace.bindAuth(auth)
 
   const { topic, results } = req.body ?? {}
   if (!Array.isArray(results)) {
+    trace.noteRawTopicLength(topic)
+    trace.finish({
+      outcome: 'validation_failed',
+      httpStatus: 400,
+      errorClass: 'results_required',
+    })
     res.status(400).json({ error: 'topic and results are required.' })
     return
   }
 
+  trace.bindResults(results)
+
   const topicResult = parseTopic(topic)
   if (!topicResult.ok) {
+    trace.noteRawTopicLength(topic)
+    trace.finish({
+      outcome: 'validation_failed',
+      httpStatus: 400,
+      errorClass: 'topic_validation',
+    })
     res.status(400).json({ error: topicResult.error })
     return
   }
+
   const normalizedTopic = topicResult.topic
+  trace.noteValidatedTopic(normalizedTopic)
 
   try {
     const rl = await checkRateLimit(admin, auth.uid, 'generateSessionSummary')
     if (!rl.ok) {
+      trace.finish({
+        outcome: 'rate_limited',
+        httpStatus: RATE_LIMIT_STATUS,
+        errorClass: 'rate_limit',
+      })
       res.status(RATE_LIMIT_STATUS).json({ error: rl.error })
       return
     }
@@ -158,8 +213,14 @@ exports.generateSessionSummary = onRequest({ secrets: [anthropicKey] }, async (r
       ],
     })
 
+    trace.finish({ outcome: 'success', httpStatus: 200 })
     res.json({ summary: response.content[0].text.trim() })
   } catch (e) {
+    trace.finish({
+      outcome: 'internal_error',
+      httpStatus: 500,
+      errorClass: 'exception',
+    })
     res.status(500).json({ error: e.message })
   }
 })
