@@ -1,5 +1,7 @@
 import { createTheme } from '@mui/material'
 
+const prefersReducedMotion = '@media (prefers-reduced-motion: reduce)'
+
 export function createAppTheme(mode) {
   const isDark = mode === 'dark'
 
@@ -67,6 +69,9 @@ export function createAppTheme(mode) {
             border: cardBorder,
             boxShadow: cardShadow,
             transition: 'box-shadow 0.2s ease, transform 0.15s ease',
+            [prefersReducedMotion]: {
+              transition: 'none',
+            },
           },
         },
       },
@@ -74,6 +79,9 @@ export function createAppTheme(mode) {
         styleOverrides: {
           root: {
             '&:hover .MuiCardContent-root': { transform: 'translateY(-1px)' },
+            [prefersReducedMotion]: {
+              '&:hover .MuiCardContent-root': { transform: 'none' },
+            },
           },
         },
       },

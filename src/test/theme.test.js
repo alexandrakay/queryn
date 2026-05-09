@@ -18,4 +18,18 @@ describe('createAppTheme', () => {
     const cardRoot = theme.components?.MuiCard?.styleOverrides?.root
     expect(cardRoot?.boxShadow).not.toBe('none')
   })
+
+  it('disables card transition under prefers-reduced-motion', () => {
+    const theme = createAppTheme('light')
+    const cardRoot = theme.components?.MuiCard?.styleOverrides?.root
+    const reduced = cardRoot?.['@media (prefers-reduced-motion: reduce)']
+    expect(reduced?.transition).toBe('none')
+  })
+
+  it('removes card content hover lift under prefers-reduced-motion', () => {
+    const theme = createAppTheme('light')
+    const root = theme.components?.MuiCardActionArea?.styleOverrides?.root
+    const reduced = root?.['@media (prefers-reduced-motion: reduce)']
+    expect(reduced?.['&:hover .MuiCardContent-root']?.transform).toBe('none')
+  })
 })
