@@ -42,7 +42,7 @@ queryn generates on-demand multiple choice quizzes across 12 core Computer Scien
 | Hosting | Firebase Hosting |
 | AI | Anthropic Claude Haiku (`claude-haiku-4-5-20251001`) |
 | API security | Firebase Cloud Functions (API key server-side) |
-| Testing | Vitest + Testing Library |
+| Testing | Vitest + Testing Library + Playwright (smoke) |
 
 ---
 
@@ -68,6 +68,7 @@ Sign in → Pick topic → 5 AI questions → Answer + explanation → Score + A
 ```
 queryn/
 ├── src/
+│   ├── e2eFlags.js              # `VITE_E2E` gate + stub user id (Playwright)
 │   ├── App.jsx                  # Root — routing, theme toggle, auth guard
 │   ├── theme.js                 # MUI theme (dark editorial palette)
 │   ├── components/
@@ -86,6 +87,10 @@ queryn/
 ├── functions/
 │   ├── index.js                 # Cloud Functions — proxies Anthropic API calls server-side
 │   └── aiRequestLog.js          # Structured Cloud Logging for AI HTTPS handlers
+├── e2e/
+│   └── smoke.spec.js            # Playwright — topic grid → quiz (mocked Cloud Functions)
+├── playwright.config.js         # E2E runner + `npm run dev:e2e` webServer
+├── .env.e2e                     # Dummy `VITE_*` + `VITE_E2E=1` for Playwright only (committed)
 ├── firebase.json                # Hosting + Functions config
 └── firestore.rules              # Auth-gated read/write rules
 ```
@@ -172,6 +177,21 @@ npm run dev         # start dev server at localhost:5173
 npm run test        # run test suite (Vitest)
 npm run test:watch  # watch mode
 ```
+
+### End-to-end (Playwright)
+
+Smoke tests use **`vite --mode e2e`**, which loads **`.env.e2e`** (`VITE_E2E=1` plus placeholder Firebase keys). In that mode the app skips Google sign-in and treats you as signed in with a fixed stub user (`src/e2eFlags.js`, `src/context/AuthContext.jsx`). Cloud Function traffic is **not** required: specs stub `generateQuestions` / `generateSessionSummary` with `page.route` so CI never calls Anthropic.
+
+```bash
+npm install
+npm run playwright:install        # Chromium into node_modules (matches playwright.config.js)
+npm run test:e2e                  # starts dev:e2e if needed, runs e2e/smoke.spec.js
+npm run test:e2e:ui               # optional Playwright UI mode
+```
+
+`playwright.config.js` sets `PLAYWRIGHT_BROWSERS_PATH=0` so browsers live under `node_modules/` (avoids broken global caches in some IDE environments). On Windows without sh, run `set PLAYWRIGHT_BROWSERS_PATH=0` then `npx playwright install chromium`, or use Git Bash.
+
+Do not set `VITE_E2E` in production builds; it exists only for automated browser runs.
 
 ### Deploy
 
