@@ -189,7 +189,7 @@ npm run test:e2e                  # starts dev:e2e if needed, runs e2e/smoke.spe
 npm run test:e2e:ui               # optional Playwright UI mode
 ```
 
-`playwright.config.js` sets `PLAYWRIGHT_BROWSERS_PATH=0` so browsers live under `node_modules/` (avoids broken global caches in some IDE environments). On Windows without sh, run `set PLAYWRIGHT_BROWSERS_PATH=0` then `npx playwright install chromium`, or use Git Bash.
+`playwright.config.js` sets `PLAYWRIGHT_BROWSERS_PATH=0` so browsers live under `node_modules/` (avoids broken global caches in some IDE environments). Scripts invoke the **local** CLI via `node node_modules/playwright/cli.js` (so you do not need a global `playwright` on `PATH`). On **Windows cmd.exe**, prefer **Git Bash** or **WSL** for `npm run playwright:install` so the `PLAYWRIGHT_BROWSERS_PATH=0` prefix works; or set the variable, then run the same `node …\\playwright\\cli.js install chromium` command manually.
 
 Do not set `VITE_E2E` in production builds; it exists only for automated browser runs.
 
