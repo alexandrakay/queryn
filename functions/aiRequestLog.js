@@ -1,5 +1,12 @@
 const crypto = require('node:crypto')
-const { logger: firebaseLogger } = require('firebase-functions/logger')
+const { info: logInfo, warn: logWarn, error: logError } = require('firebase-functions/logger')
+
+/** Default sink: `firebase-functions/logger` exports functions, not a `logger` object. */
+const defaultFirebaseLogSink = {
+  info: (...args) => logInfo(...args),
+  warn: (...args) => logWarn(...args),
+  error: (...args) => logError(...args),
+}
 
 /** Log label for substring search / saved queries in Cloud Logging. */
 const LOG_MESSAGE = 'queryn_ai_request'
@@ -26,7 +33,8 @@ function pruneUndefined(obj) {
  * @param {object} opts
  */
 function logAiOutcome(loggerSink, opts) {
-  const sink = loggerSink ?? firebaseLogger
+  const sink =
+    loggerSink && typeof loggerSink.info === 'function' ? loggerSink : defaultFirebaseLogSink
   const payload = pruneUndefined({
     queryn_message: LOG_MESSAGE,
     queryn_endpoint: opts.endpoint,
@@ -55,7 +63,8 @@ function logAiOutcome(loggerSink, opts) {
  * @param {unknown} [loggerSink]
  */
 function createAiTracer(endpoint, loggerSink) {
-  const sink = loggerSink ?? firebaseLogger
+  const sink =
+    loggerSink && typeof loggerSink.info === 'function' ? loggerSink : defaultFirebaseLogSink
   const t0 = Date.now()
   /** @type {string | undefined} */
   let uid
