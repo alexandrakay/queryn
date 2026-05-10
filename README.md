@@ -164,6 +164,8 @@ npm run test        # run test suite (Vitest)
 npm run test:watch  # watch mode
 ```
 
+Cloud Functions **CORS** allows both **`http://localhost:5173`** and **`http://127.0.0.1:5173`** (and the same for Vite preview on **`:4173`**). If a `fetch` still fails, open DevTools → Network and confirm the failing request’s **Origin** matches one of those (or production hosting URLs).
+
 ### End-to-end (Playwright)
 
 Smoke tests use **`vite --mode e2e`**, which loads **`.env.e2e`** (`VITE_E2E=1` plus placeholder Firebase keys). In that mode the app skips Google sign-in and treats you as signed in with a fixed stub user. Cloud Function traffic is **not** required: specs stub `generateQuestions` / `generateSessionSummary` with `page.route` so CI never calls Anthropic.
